@@ -11,7 +11,7 @@ RUN /root/.cargo/bin/rustup update stable
 
 WORKDIR /app
 
-ADD src/main.rs /app/src/main.rs
+ADD src/ /app/src
 ADD Cargo.toml /app
 ADD Cargo.lock /app
 
