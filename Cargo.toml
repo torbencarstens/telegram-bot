@@ -5,6 +5,12 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[[bin]]
+name = "timhatdiehandandermaus"
+
+[lib]
+name = "timhatdiehandandermaus"
+
 [dependencies]
 anyhow = "1.0.45"
 teloxide = { version = "0.5.3", features = ["macros", "auto-send"] }
