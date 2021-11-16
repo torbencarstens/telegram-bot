@@ -66,11 +66,7 @@ impl Api {
         Ok(self.post::<B>(path, body)
             .await
             .map(|body| {
-                async {
-                    let body = body
-                        .map_err(|e| anyhow!("[ Api::{}[1]: failed to {:?} ]", name, e))?;
-                    Api::decode_body(body).await
-                }
+                async { Api::decode_body(body).await }
             })
             .map_err(|e| anyhow!("[ Api::{}[2]: failed to decode body: {:?} ]", name, e))?
             .await)
@@ -80,11 +76,7 @@ impl Api {
         Ok(self.post(ApiEndpoints::AddMovie.to_string(), AddMovieRequest { url: imdb_url })
             .await
             .map(|body| {
-                async {
-                    let body = body
-                        .map_err(|e| anyhow!("[ Api::add_movie[1]: failed to {:?} ]", e))?;
-                    Api::decode_body(body).await
-                }
+                async { Api::decode_body(body).await }
             })
             .map_err(|e| anyhow!("[ Api::add_movie[2]: failed to decode body: {:?} ]", e))?
             .await)
@@ -102,7 +94,7 @@ impl Api {
             .map_err(|e| anyhow!("[ decode_body: unable to decode response body for: {}, [ {:?} ] ]", std::any::type_name::<R>(), e)))
     }
 
-    async fn post<T: Serialize>(&self, path: String, body: T) -> anyhow::Result<anyhow::Result<Response>> {
+    async fn post<T: Serialize>(&self, path: String, body: T) -> anyhow::Result<Response> {
         let url = self.join_on_base_url(path)?;
 
         Ok(self
@@ -111,6 +103,6 @@ impl Api {
             .json(&body)
             .send()
             .await
-            .map_err(|e| anyhow!("[ post[0]: failed sending: {:#?} ]", e)))
+            .map_err(|e| anyhow!("[ post[0]: failed sending: {:?} ]", e))?)
     }
 }
