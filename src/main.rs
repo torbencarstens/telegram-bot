@@ -122,12 +122,16 @@ async fn answer(
     command: Command,
     api: Api,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
+    log::info!("{:?}", command);
+
     // TODO: This should be assembled from members of the group at some point (talk to API for that)
     if cx.update.chat.id != env::var("ADMIN_CHAT")?.parse::<i64>()? {
         cx.answer("You're not allowed to use this bot.").await?;
+        log::info!("{} ([u]{:?} | [f]{:?} | [l]{:?} | [t]{:?}) is not allowed to use this bot", cx.update.chat.id, cx.update.chat.username(), cx.update.chat.first_name(), cx.update.chat.last_name(), cx.update.chat.title());
 
         return Ok(());
     }
+
 
     match command {
         Command::Help => cx.answer(Command::descriptions()).await?,
