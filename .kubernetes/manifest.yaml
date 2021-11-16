@@ -54,7 +54,7 @@ metadata:
   namespace: timhatdiehandandermaus
 data:
   BOT_NAME: "timhatdiehandandermausbot"
-  BASE_URL: "api"
+  BASE_URL: "http://api"
   ADMIN_CHAT: "-766365181"
 ---
 apiVersion: v1
