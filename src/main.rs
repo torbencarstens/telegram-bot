@@ -124,7 +124,7 @@ async fn answer(
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
     // TODO: This should be assembled from members of the group at some point (talk to API for that)
     if cx.update.chat.id != env::var("ADMIN_CHAT")?.parse::<i64>()? {
-        return cx.answer("You're not allowed to use this bot.").await?;
+        return Ok(cx.answer("You're not allowed to use this bot.").await?);
     }
 
     match command {
