@@ -105,4 +105,15 @@ impl Api {
             .await
             .map_err(|e| anyhow!("[ post[0]: failed sending: {:?} ]", e))?)
     }
+
+    async fn delete(&self, path: String) -> anyhow::Result<Response> {
+        let url = self.join_on_base_url(path)?;
+
+        Ok(self
+            .client
+            .delete(url)
+            .send()
+            .await
+            .map_err(|e| anyhow!("[ delete[0]: failed sending: {:?} ]"))?)
+    }
 }
