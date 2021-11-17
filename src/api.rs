@@ -67,7 +67,7 @@ impl Api {
             .await)
     }
 
-    pub async fn delete_movie(&self, id: String) -> anyhow::Result<anyhow::Result<anyhow::Result<()>>> {
+    pub async fn delete_movie(&self, id: String) -> anyhow::Result<anyhow::Result<anyhow::Result<Movie>>> {
         Ok(self.delete(ApiEndpoints::DeleteMovie(id.clone()).to_string())
             .await
             .map(|body| {
