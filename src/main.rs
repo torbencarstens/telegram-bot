@@ -1,6 +1,6 @@
 use std::env;
 use std::error::Error;
-use std::fmt::Debug;
+use std::fmt::{self, Debug};
 use std::str::FromStr;
 
 use anyhow::anyhow;
@@ -59,13 +59,13 @@ enum Command {
 }
 
 impl Command {
-    fn wade_through<T: Serialize + Debug>(s: &str, r: anyhow::Result<anyhow::Result<anyhow::Result<T>>>) -> anyhow::Result<String> {
+    fn wade_through<T: Serialize + Debug + fmt::Display>(s: &str, r: anyhow::Result<anyhow::Result<anyhow::Result<T>>>) -> anyhow::Result<String> {
         match r {
             Ok(value) => {
                 match value {
                     Ok(value) => {
                         match value {
-                            Ok(result) => Ok(format!("{:#?}", result)),
+                            Ok(result) => Ok(format!("{:?}", result)),
                             Err(error) => Err(anyhow!("[ {}[3]: {:?} ]", s, error))
                         }
                     }
