@@ -1,6 +1,7 @@
 use std::fmt;
 use std::fmt::Formatter;
 use std::str::FromStr;
+use anyhow::anyhow;
 
 use serde::{Deserialize, Serialize};
 
@@ -36,7 +37,7 @@ impl FromStr for MovieStatus {
             WATCHED_STR => Ok(MovieStatus::Watched),
             DELETED_STR => Ok(MovieStatus::Deleted),
             // TODO: throw error
-            status => unimplemented!("status is unimplemented: {}", status)
+            status => Err(anyhow!("{} is not implemented for `MovieStatus`", status))
         }
     }
 }
