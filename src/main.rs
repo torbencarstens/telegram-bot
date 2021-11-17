@@ -65,7 +65,7 @@ impl Command {
                 match value {
                     Ok(value) => {
                         match value {
-                            Ok(result) => Ok(format!("{:?}", result)),
+                            Ok(result) => Ok(format!("{}", result)),
                             Err(error) => Err(anyhow!("[ {}[3]: {:?} ]", s, error))
                         }
                     }
