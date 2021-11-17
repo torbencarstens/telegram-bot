@@ -54,22 +54,20 @@ pub struct QueueMovie {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Movie {
     id: String,
-    #[serde(rename = "imdbData")]
-    imdb_data: ImdbMovie,
+    imdb: ImdbMovie,
     status: MovieStatus,
 }
 
 impl fmt::Display for Movie {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{} ({}) {}⭐", self.imdb_data.title, self.imdb_data.year, self.imdb_data.rating)
+        write!(f, "{} ({}) {}⭐", self.imdb.title, self.imdb.year, self.imdb.rating)
     }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ImdbMovie {
-    #[serde(rename = "imdbId")]
-    imdb_id: String,
+    id: String,
     title: String,
     year: u32,
-    rating: f32,
+    rating: String,
 }

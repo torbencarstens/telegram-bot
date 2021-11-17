@@ -26,11 +26,6 @@ struct AddMovieRequest {
     url: Url,
 }
 
-#[derive(Serialize)]
-struct DeleteMovieRequest {
-    id: String,
-}
-
 impl ToString for ApiEndpoints {
     fn to_string(&self) -> String {
         match self {
@@ -62,44 +57,40 @@ impl Api {
         Ok(self.base_url.join(endpoint.as_str())?)
     }
 
-    pub async fn interact<B: Serialize, T: DeserializeOwned + 'static>(&self, name: &str, path: String, body: B) -> anyhow::Result<anyhow::Result<anyhow::Result<T>>> {
-        Ok(self.post::<B>(path, body)
-            .await
-            .map(|body| {
-                async { Api::decode_body(body).await }
-            })
-            .map_err(|e| anyhow!("[ Api::{}[2]: failed to decode body: {:?} ]", name, e))?
-            .await)
-    }
-
     pub async fn add_movie(&self, imdb_url: Url) -> anyhow::Result<anyhow::Result<anyhow::Result<Movie>>> {
-        Ok(self.post(ApiEndpoints::AddMovie.to_string(), AddMovieRequest { url: imdb_url })
+        Ok(self.put(ApiEndpoints::AddMovie.to_string(), AddMovieRequest { url: imdb_url })
             .await
             .map(|body| {
-                async { Api::decode_body(body).await }
+                async { Api::decode_body::<Movie>(body).await }
             })
             .map_err(|e| anyhow!("[ Api::add_movie[2]: failed to decode body: {:?} ]", e))?
             .await)
     }
 
     pub async fn delete_movie(&self, id: String) -> anyhow::Result<anyhow::Result<anyhow::Result<()>>> {
-        self.interact("delete_movie", ApiEndpoints::DeleteMovie(id.clone()).to_string(), DeleteMovieRequest { id }).await
+        Ok(self.delete(ApiEndpoints::DeleteMovie(id.clone()).to_string())
+            .await
+            .map(|body| {
+                async { Api::decode_body(body).await }
+            })
+            .map_err(|e| anyhow!("[ Api::delete_movie[0]: failed to decode body: {:?} ]", e))?
+            .await)
     }
 
-    async fn decode_body<'a, R: DeserializeOwned>(id: Response) -> anyhow::Result<anyhow::Result<R>> {
-        let response_value = id
+    async fn decode_body<'a, R: DeserializeOwned>(response: Response) -> anyhow::Result<anyhow::Result<R>> {
+        let response_value = response
             .json::<R>()
             .await;
         Ok(response_value
             .map_err(|e| anyhow!("[ decode_body: unable to decode response body for: {}, [ {:?} ] ]", std::any::type_name::<R>(), e)))
     }
 
-    async fn post<T: Serialize>(&self, path: String, body: T) -> anyhow::Result<Response> {
+    async fn put<T: Serialize>(&self, path: String, body: T) -> anyhow::Result<Response> {
         let url = self.join_on_base_url(path)?;
 
         Ok(self
             .client
-            .post(url)
+            .put(url)
             .json(&body)
             .send()
             .await
@@ -114,6 +105,6 @@ impl Api {
             .delete(url)
             .send()
             .await
-            .map_err(|e| anyhow!("[ delete[0]: failed sending: {:?} ]"))?)
+            .map_err(|error| anyhow!("[ delete[0]: failed sending: {:?} ]", error))?)
     }
 }

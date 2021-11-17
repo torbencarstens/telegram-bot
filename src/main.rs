@@ -65,8 +65,7 @@ impl Command {
                 match value {
                     Ok(value) => {
                         match value {
-                            Ok(result) => serde_json::to_string(&result)
-                                .map_err(|error| anyhow!("[ {}[2]: failed to deserialize movie: {:?}]", error, s)),
+                            Ok(result) => Ok(format!("{:#?}", result)),
                             Err(error) => Err(anyhow!("[ {}[3]: {:?} ]", s, error))
                         }
                     }
