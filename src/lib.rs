@@ -1,8 +1,8 @@
 use std::fmt;
 use std::fmt::Formatter;
 use std::str::FromStr;
-use anyhow::anyhow;
 
+use anyhow::anyhow;
 use serde::{Deserialize, Serialize};
 
 pub mod api;
@@ -71,4 +71,6 @@ pub struct ImdbMovie {
     title: String,
     year: u32,
     rating: String,
+    #[serde(rename = "coverUrl")]
+    cover_url: String,
 }
