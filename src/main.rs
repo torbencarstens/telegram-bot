@@ -63,9 +63,9 @@ impl Command {
         match r {
             Ok(value) => match value {
                     Ok(value) => Ok(format!("{}", value)),
-                    Err(error) => Err(anyhow!("[ {}[3]: failed decoding body: {:?} ]", s, error))
+                    Err(error) => Err(anyhow!("[ {}[0]: failed decoding body: {:?} ]", s, error))
                 }
-            Err(error) => Err(anyhow!("[ {}[5]: failed making api request: {:?} ]", s, error))
+            Err(error) => Err(anyhow!("[ {}[1]: failed making api request: {:?} ]", s, error))
         }
     }
 
@@ -81,7 +81,7 @@ impl Command {
 
                 match Command::wade_through("add_movie", api.add_movie(url).await) {
                     Ok(value) => value,
-                    Err(error) => format!("[ add_movie[6]: {:?} ]", error)
+                    Err(error) => format!("[ add_movie[2]: {:?} ]", error)
                 }
             }
         };
@@ -89,7 +89,7 @@ impl Command {
         cx
             .answer(msg)
             .await
-            .map_err(|e| anyhow!("[ add_movie[7]: couldn't answer: {} ]", e))
+            .map_err(|e| anyhow!("[ add_movie[3]: couldn't answer: {} ]", e))
     }
 
     pub async fn delete_movie(cx: UpdateWithCx<AutoSend<Bot>, Message>, api: Api, movie_id: String) -> anyhow::Result<Message> {
@@ -98,14 +98,14 @@ impl Command {
         } else {
             match Command::wade_through("delete_movie", api.delete_movie(movie_id).await) {
                 Ok(value) => value,
-                Err(error) => format!("[ delete_movie[6]: {:?} ]", error)
+                Err(error) => format!("[ delete_movie[2]: {:?} ]", error)
             }
         };
 
         cx
             .answer(msg)
             .await
-            .map_err(|e| anyhow!("[ delete_movie[7]: couldn't answer: {} ]", e))
+            .map_err(|e| anyhow!("[ delete_movie[3]: couldn't answer: {} ]", e))
     }
 }
 
