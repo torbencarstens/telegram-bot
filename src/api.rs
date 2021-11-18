@@ -10,9 +10,10 @@ use url::Url;
 
 use crate::Movie;
 
-pub enum ApiEndpoints {
+pub enum ApiEndpoints<'a> {
     AddMovie,
-    DeleteMovie(String),
+    DeleteMovie(&'a String),
+    GetMovie(&'a String),
 }
 
 #[derive(Error, Debug)]
@@ -27,11 +28,14 @@ struct AddMovieRequest {
     url: Url,
 }
 
-impl ToString for ApiEndpoints {
+impl<'a> ToString for ApiEndpoints<'a> {
     fn to_string(&self) -> String {
         match self {
             ApiEndpoints::AddMovie => "movie".to_string(),
             ApiEndpoints::DeleteMovie(id) => {
+                format!("movie/{}", id)
+            },
+            ApiEndpoints::GetMovie(id) => {
                 format!("movie/{}", id)
             }
         }.to_string()
@@ -54,7 +58,7 @@ impl Api {
         }
     }
 
-    fn join_on_base_url(&self, endpoint: String) -> anyhow::Result<Url> {
+    fn join_on_base_url(&self, endpoint: &String) -> anyhow::Result<Url> {
         Ok(self.base_url.join(endpoint.as_str())?)
     }
 
@@ -66,10 +70,17 @@ impl Api {
     }
 
     pub async fn delete_movie(&self, id: String) -> anyhow::Result<anyhow::Result<Movie>> {
-        self.delete(ApiEndpoints::DeleteMovie(id.clone()).to_string())
+        self.delete(ApiEndpoints::DeleteMovie(&id).to_string())
             .await
             .map(|body| executor::block_on(Api::decode_body(body)))
             .map_err(|e| anyhow!("[ Api::delete_movie[0]: failed to delete movie from endpoint: {:?} ]", e))
+    }
+
+    pub async fn get_movie(&self, id: String) -> anyhow::Result<anyhow::Result<Movie>> {
+        self.get(ApiEndpoints::GetMovie(&id).to_string())
+            .await
+            .map(|body| executor::block_on(Api::decode_body(body)))
+            .map_err(|e| anyhow!("[  Api::get_movie[0]: failed to retrieve movie: {:?} ]", e))
     }
 
     async fn decode_body<'a, R: DeserializeOwned>(response: Response) -> anyhow::Result<R> {
@@ -79,8 +90,19 @@ impl Api {
             .map_err(|e| anyhow!("[ decode_body: unable to decode response body for: {}, [ {:?} ] ]", std::any::type_name::<R>(), e))
     }
 
+    async fn get(&self, path: String) -> anyhow::Result<Response> {
+        let url = self.join_on_base_url(&path)?;
+
+        Ok(self
+            .client
+            .get(url)
+            .send()
+            .await
+            .map_err(|e| anyhow!("[  get[0]: failed getting {}: {:?} ]", path, e))?)
+    }
+
     async fn put<T: Serialize>(&self, path: String, body: T) -> anyhow::Result<Response> {
-        let url = self.join_on_base_url(path)?;
+        let url = self.join_on_base_url(&path)?;
 
         Ok(self
             .client
@@ -92,7 +114,7 @@ impl Api {
     }
 
     async fn delete(&self, path: String) -> anyhow::Result<Response> {
-        let url = self.join_on_base_url(path)?;
+        let url = self.join_on_base_url(&path)?;
 
         Ok(self
             .client
