@@ -33,7 +33,7 @@ impl<'a> ToString for ApiEndpoints<'a> {
         match self {
             ApiEndpoints::AddMovie => "movie".to_string(),
             ApiEndpoints::DeleteMovie(id) => {
-                format!("movie/{}", id)
+                format!("queue/{}", id)
             },
             ApiEndpoints::GetMovie(id) => {
                 format!("movie/{}", id)
