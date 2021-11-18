@@ -59,20 +59,13 @@ enum Command {
 }
 
 impl Command {
-    fn wade_through<T: Serialize + Debug + fmt::Display>(s: &str, r: anyhow::Result<anyhow::Result<anyhow::Result<T>>>) -> anyhow::Result<String> {
+    fn wade_through<T: Serialize + Debug + fmt::Display>(s: &str, r: anyhow::Result<anyhow::Result<T>>) -> anyhow::Result<String> {
         match r {
-            Ok(value) => {
-                match value {
-                    Ok(value) => {
-                        match value {
-                            Ok(result) => Ok(format!("{}", result)),
-                            Err(error) => Err(anyhow!("[ {}[3]: {:?} ]", s, error))
-                        }
-                    }
-                    Err(error) => Err(anyhow!("[ {}[4]: {:?} ]", s, error))
+            Ok(value) => match value {
+                    Ok(value) => Ok(format!("{}", value)),
+                    Err(error) => Err(anyhow!("[ {}[3]: failed decoding body: {:?} ]", s, error))
                 }
-            }
-            Err(error) => Err(anyhow!("[ {}[5]: {:?} ]", s, error))
+            Err(error) => Err(anyhow!("[ {}[5]: failed making api request: {:?} ]", s, error))
         }
     }
 

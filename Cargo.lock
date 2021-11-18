@@ -1287,6 +1287,7 @@ name = "timhatdiehandandermaus"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "futures",
  "futures-util",
  "log",
  "pretty_env_logger",

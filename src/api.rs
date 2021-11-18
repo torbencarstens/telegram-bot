@@ -1,4 +1,5 @@
 use anyhow::anyhow;
+use futures::executor;
 use reqwest::Client;
 use reqwest::Response;
 use serde::de::DeserializeOwned;
@@ -11,7 +12,7 @@ use crate::Movie;
 
 pub enum ApiEndpoints {
     AddMovie,
-    DeleteMovie(String)
+    DeleteMovie(String),
 }
 
 #[derive(Error, Debug)]
@@ -57,32 +58,25 @@ impl Api {
         Ok(self.base_url.join(endpoint.as_str())?)
     }
 
-    pub async fn add_movie(&self, imdb_url: Url) -> anyhow::Result<anyhow::Result<anyhow::Result<Movie>>> {
-        Ok(self.put(ApiEndpoints::AddMovie.to_string(), AddMovieRequest { url: imdb_url })
+    pub async fn add_movie(&self, imdb_url: Url) -> anyhow::Result<anyhow::Result<Movie>> {
+        self.put(ApiEndpoints::AddMovie.to_string(), AddMovieRequest { url: imdb_url })
             .await
-            .map(|body| {
-                async { Api::decode_body::<Movie>(body).await }
-            })
-            .map_err(|e| anyhow!("[ Api::add_movie[2]: failed to decode body: {:?} ]", e))?
-            .await)
+            .map(|body| executor::block_on(Api::decode_body::<Movie>(body)))
+            .map_err(|e| anyhow!("[ Api::add_movie[2]: failed to `PUT` to endpoint: {:?} ]", e))
     }
 
-    pub async fn delete_movie(&self, id: String) -> anyhow::Result<anyhow::Result<anyhow::Result<Movie>>> {
-        Ok(self.delete(ApiEndpoints::DeleteMovie(id.clone()).to_string())
+    pub async fn delete_movie(&self, id: String) -> anyhow::Result<anyhow::Result<Movie>> {
+        self.delete(ApiEndpoints::DeleteMovie(id.clone()).to_string())
             .await
-            .map(|body| {
-                async { Api::decode_body(body).await }
-            })
-            .map_err(|e| anyhow!("[ Api::delete_movie[0]: failed to decode body: {:?} ]", e))?
-            .await)
+            .map(|body| executor::block_on(Api::decode_body(body)))
+            .map_err(|e| anyhow!("[ Api::delete_movie[0]: failed to delete movie from endpoint: {:?} ]", e))
     }
 
-    async fn decode_body<'a, R: DeserializeOwned>(response: Response) -> anyhow::Result<anyhow::Result<R>> {
-        let response_value = response
+    async fn decode_body<'a, R: DeserializeOwned>(response: Response) -> anyhow::Result<R> {
+        response
             .json::<R>()
-            .await;
-        Ok(response_value
-            .map_err(|e| anyhow!("[ decode_body: unable to decode response body for: {}, [ {:?} ] ]", std::any::type_name::<R>(), e)))
+            .await
+            .map_err(|e| anyhow!("[ decode_body: unable to decode response body for: {}, [ {:?} ] ]", std::any::type_name::<R>(), e))
     }
 
     async fn put<T: Serialize>(&self, path: String, body: T) -> anyhow::Result<Response> {
