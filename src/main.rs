@@ -9,6 +9,7 @@ use tokio;
 use url::Url;
 
 use timhatdiehandandermaus::api::Api;
+use timhatdiehandandermaus::{MovieDeleteStatus, MovieStatus};
 
 #[derive(Debug)]
 struct CommandTypeMovieRating {
@@ -55,6 +56,8 @@ enum Command {
     RateMovie(CommandTypeMovieRating),
     #[command(description = "remove rating from movie (`/unratemovie {id}`)")]
     UnrateMovie(String),
+    #[command(description = "mark a movie as watched, this deletes the movie from the queue (`/watch {id}`)")]
+    Watch(String),
 }
 
 impl Command {
@@ -91,11 +94,11 @@ impl Command {
             .map_err(|e| anyhow!("[ add_movie[3]: couldn't answer: {} ]", e))
     }
 
-    pub async fn delete_movie(cx: UpdateWithCx<AutoSend<Bot>, Message>, api: Api, movie_id: String) -> anyhow::Result<Message> {
+    pub async fn delete_movie(cx: UpdateWithCx<AutoSend<Bot>, Message>, api: Api, movie_id: String, status: MovieDeleteStatus) -> anyhow::Result<Message> {
         let msg = if movie_id == "" {
             "`/deletemovie` must be followed by a movie ID you idiot".to_string()
         } else {
-            match Command::wade_through("delete_movie", api.delete_movie(movie_id).await) {
+            match Command::wade_through("delete_movie", api.delete_movie(movie_id, status).await) {
                 Ok(value) => value,
                 Err(error) => format!("[ delete_movie[2]: {:?} ]", error)
             }
@@ -144,8 +147,9 @@ async fn answer(
             cx.answer(format!("Tim")).await?
         }
         Command::AddMovie(imdb_url) => Command::add_movie(cx, api, imdb_url).await?,
-        Command::DeleteMovie(movie_id) => Command::delete_movie(cx, api, movie_id).await?,
+        Command::DeleteMovie(movie_id) => Command::delete_movie(cx, api, movie_id, MovieDeleteStatus::Deleted).await?,
         Command::Queue => Command::queue(cx, api).await?,
+        Command::Watch(movie_id) => Command::delete_movie(cx, api, movie_id, MovieDeleteStatus::Watched).await?,
         command_name => {
             cx.answer(format!("{:#?} is not implemented yet.", command_name)).await?
         }

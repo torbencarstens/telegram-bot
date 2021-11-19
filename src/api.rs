@@ -7,11 +7,11 @@ use teloxide_core::net;
 use thiserror::Error;
 use url::Url;
 
-use crate::{Movie, Movies, Queue};
+use crate::{Movie, MovieDeleteStatus, Movies, MovieStatus, Queue};
 
 pub enum ApiEndpoints<'a> {
     AddMovie,
-    DeleteMovie(&'a String),
+    DeleteMovie(&'a String, MovieDeleteStatus),
     GetMovie(&'a String),
     Queue,
 }
@@ -32,8 +32,8 @@ impl<'a> ToString for ApiEndpoints<'a> {
     fn to_string(&self) -> String {
         match self {
             ApiEndpoints::AddMovie => "movie".to_string(),
-            ApiEndpoints::DeleteMovie(id) => {
-                format!("queue/{}", id)
+            ApiEndpoints::DeleteMovie(id, status) => {
+                format!("queue/{}?status={}", id, status.to_string())
             },
             ApiEndpoints::GetMovie(id) => {
                 format!("movie/{}", id)
@@ -71,8 +71,8 @@ impl Api {
             .map_err(|e| anyhow!("[ Api::add_movie[2]: failed to `PUT` to endpoint: {:?} ]", e))
     }
 
-    pub async fn delete_movie(&self, id: String) -> anyhow::Result<anyhow::Result<Movie>> {
-        self.delete(ApiEndpoints::DeleteMovie(&id).to_string())
+    pub async fn delete_movie(&self, id: String, status: MovieDeleteStatus) -> anyhow::Result<anyhow::Result<Movie>> {
+        self.delete(ApiEndpoints::DeleteMovie(&id, status).to_string())
             .await
             .map(|body| {
                 println!("{:?}", body.status());

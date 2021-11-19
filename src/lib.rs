@@ -12,6 +12,21 @@ const WATCHED_STR: &str = "Watched";
 const DELETED_STR: &str = "Deleted";
 
 #[derive(Debug, Deserialize, Serialize)]
+pub enum MovieDeleteStatus {
+    Watched,
+    Deleted,
+}
+
+impl ToString for MovieDeleteStatus {
+    fn to_string(&self) -> String {
+        match self {
+            MovieDeleteStatus::Watched => "Watched",
+            MovieDeleteStatus::Deleted => "Deleted"
+        }.to_string()
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub enum MovieStatus {
     Queued,
     Watched,
