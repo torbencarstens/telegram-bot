@@ -4,7 +4,6 @@ use std::fmt::{self, Debug};
 use std::str::FromStr;
 
 use anyhow::anyhow;
-use serde::Serialize;
 use teloxide::{prelude::*, utils::command::BotCommand};
 use tokio;
 use url::Url;
@@ -51,7 +50,7 @@ enum Command {
     #[command(description = "mark movie as watched from queue (`/deletemovie {id}`)")]
     WatchMovie(String),
     #[command(description = "lists all movies")]
-    ListMovies,
+    Queue,
     #[command(description = "rate movie (`/ratemovie {id} {rating}`), rating can be a number between 0 - 10")]
     RateMovie(CommandTypeMovieRating),
     #[command(description = "remove rating from movie (`/unratemovie {id}`)")]
@@ -59,12 +58,12 @@ enum Command {
 }
 
 impl Command {
-    fn wade_through<T: Serialize + Debug + fmt::Display>(s: &str, r: anyhow::Result<anyhow::Result<T>>) -> anyhow::Result<String> {
+    fn wade_through<T: Debug + fmt::Display>(s: &str, r: anyhow::Result<anyhow::Result<T>>) -> anyhow::Result<String> {
         match r {
             Ok(value) => match value {
-                    Ok(value) => Ok(format!("{}", value)),
-                    Err(error) => Err(anyhow!("[ {}[0]: failed decoding body: {:?} ]", s, error))
-                }
+                Ok(value) => Ok(format!("{}", value)),
+                Err(error) => Err(anyhow!("[ {}[0]: failed decoding body: {:?} ]", s, error))
+            }
             Err(error) => Err(anyhow!("[ {}[1]: failed making api request: {:?} ]", s, error))
         }
     }
@@ -107,6 +106,20 @@ impl Command {
             .await
             .map_err(|e| anyhow!("[ delete_movie[3]: couldn't answer: {} ]", e))
     }
+
+    pub async fn queue(cx: UpdateWithCx<AutoSend<Bot>, Message>, api: Api) -> anyhow::Result<Message> {
+        let msg = match Command::wade_through("queue", Ok(api
+            .queue()
+            .await)) {
+            Ok(value) => value,
+            Err(error) => format!("[ queue[2]: {:?} ]", error)
+        };
+
+        cx
+            .answer(msg)
+            .await
+            .map_err(|e| anyhow!("[ queue[3]: couldn't answer: {} ]", e))
+    }
 }
 
 async fn answer(
@@ -132,6 +145,7 @@ async fn answer(
         }
         Command::AddMovie(imdb_url) => Command::add_movie(cx, api, imdb_url).await?,
         Command::DeleteMovie(movie_id) => Command::delete_movie(cx, api, movie_id).await?,
+        Command::Queue => Command::queue(cx, api).await?,
         command_name => {
             cx.answer(format!("{:#?} is not implemented yet.", command_name)).await?
         }

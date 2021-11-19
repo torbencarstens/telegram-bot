@@ -44,7 +44,7 @@ impl FromStr for MovieStatus {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Queue {
-    queue: QueueMovie,
+    queue: Vec<QueueMovie>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -57,6 +57,24 @@ pub struct Movie {
     id: String,
     imdb: ImdbMovie,
     status: MovieStatus,
+}
+
+#[derive(Debug)]
+pub struct Movies {
+    pub movies: Vec<anyhow::Result<Movie>>
+}
+
+impl fmt::Display for Movies {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self
+            .movies
+            .iter()
+            .map(|movie| match movie {
+                Ok(movie) => format!("{}", movie),
+                Err(e) => format!("failed retrieving movie: {:?}", e)
+            })
+            .fold(String::new(), |acc, s| acc + s.as_str() + "\n"))
+    }
 }
 
 impl fmt::Display for Movie {
