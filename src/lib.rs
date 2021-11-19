@@ -84,11 +84,16 @@ impl fmt::Display for Movie {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct ImdbCover {
+    url: String,
+    ratio: f32,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct ImdbMovie {
     id: String,
     title: String,
     year: u32,
     rating: String,
-    #[serde(rename = "coverUrl")]
-    cover_url: String,
+    cover: ImdbCover,
 }
