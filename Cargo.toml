@@ -12,7 +12,7 @@ name = "timhatdiehandandermaus"
 name = "timhatdiehandandermaus"
 
 [dependencies]
-anyhow = "1.0.50"
+anyhow = "1.0.51"
 teloxide = { version = "0.5.3", features = ["macros", "auto-send"] }
 tokio = { version = "1.14.0", features = ["rt-multi-thread", "macros"] }
 log = "0.4.8"
