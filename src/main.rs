@@ -46,7 +46,7 @@ enum Command {
     WerHatDieHandAnDerMaus,
     #[command(description = "add movie to queue (`/add {imdb-link}`)")]
     Add(String),
-    #[command(description = "deletes movie from queue (`/delete {id}`)")]
+    #[command(description = "deletes movie from queue (`/delete {title}`)")]
     Delete(String),
     #[command(description = "lists all movies")]
     Queue,
@@ -54,7 +54,7 @@ enum Command {
     Rate(CommandTypeMovieRating),
     #[command(description = "remove rating from movie (`/unrate {id}`)")]
     Unrate(String),
-    #[command(description = "mark a movie as watched, this deletes the movie from the queue (`/watch {id}`)")]
+    #[command(description = "mark a movie as watched, this deletes the movie from the queue (`/watch {title}`)")]
     Watch(String),
     #[command(description = "get a movie by title (has to be exact) (`/get {title}`)")]
     Get(String),
