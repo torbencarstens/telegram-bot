@@ -7,7 +7,7 @@ use teloxide_core::net;
 use thiserror::Error;
 use url::Url;
 
-use crate::{Movie, MovieDeleteStatus, Movies, MovieStatus, Queue};
+use crate::{Movie, MovieDeleteStatus, Movies, Queue};
 
 pub enum ApiEndpoints<'a> {
     AddMovie,

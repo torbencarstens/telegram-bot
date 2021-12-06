@@ -9,7 +9,7 @@ use tokio;
 use url::Url;
 
 use timhatdiehandandermaus::api::Api;
-use timhatdiehandandermaus::{MovieDeleteStatus, MovieStatus};
+use timhatdiehandandermaus::MovieDeleteStatus;
 
 #[derive(Debug)]
 struct CommandTypeMovieRating {
@@ -44,18 +44,16 @@ enum Command {
     Help,
     #[command(description = "inform the user who has the hand on the mouse")]
     WerHatDieHandAnDerMaus,
-    #[command(description = "add movie to queue (`/addmovie {imdb-link}`)")]
-    AddMovie(String),
-    #[command(description = "deletes movie from queue (`/deletemovie {id}`)")]
-    DeleteMovie(String),
-    #[command(description = "mark movie as watched from queue (`/deletemovie {id}`)")]
-    WatchMovie(String),
+    #[command(description = "add movie to queue (`/add {imdb-link}`)")]
+    Add(String),
+    #[command(description = "deletes movie from queue (`/delete {id}`)")]
+    Delete(String),
     #[command(description = "lists all movies")]
     Queue,
-    #[command(description = "rate movie (`/ratemovie {id} {rating}`), rating can be a number between 0 - 10")]
-    RateMovie(CommandTypeMovieRating),
-    #[command(description = "remove rating from movie (`/unratemovie {id}`)")]
-    UnrateMovie(String),
+    #[command(description = "rate movie (`/rate {id} {rating}`), rating can be a number between 0 - 10")]
+    Rate(CommandTypeMovieRating),
+    #[command(description = "remove rating from movie (`/unrat {id}`)")]
+    Unrate(String),
     #[command(description = "mark a movie as watched, this deletes the movie from the queue (`/watch {id}`)")]
     Watch(String),
 }
@@ -146,8 +144,8 @@ async fn answer(
         Command::WerHatDieHandAnDerMaus => {
             cx.answer(format!("Tim")).await?
         }
-        Command::AddMovie(imdb_url) => Command::add_movie(cx, api, imdb_url).await?,
-        Command::DeleteMovie(movie_id) => Command::delete_movie(cx, api, movie_id, MovieDeleteStatus::Deleted).await?,
+        Command::Add(imdb_url) => Command::add_movie(cx, api, imdb_url).await?,
+        Command::Delete(movie_id) => Command::delete_movie(cx, api, movie_id, MovieDeleteStatus::Deleted).await?,
         Command::Queue => Command::queue(cx, api).await?,
         Command::Watch(movie_id) => Command::delete_movie(cx, api, movie_id, MovieDeleteStatus::Watched).await?,
         command_name => {
