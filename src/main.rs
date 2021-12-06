@@ -73,7 +73,7 @@ impl Command {
 
     pub async fn add_movie(cx: UpdateWithCx<AutoSend<Bot>, Message>, api: Api, imdb_url: String) -> Result<Message, anyhow::Error> {
         let msg = if imdb_url == "" {
-            "`/addmovie` must be followed by an imdb URL you idiot".to_string()
+            "`/add` must be followed by an imdb URL you idiot".to_string()
         } else {
             let url = Url::parse(imdb_url.as_str());
             if url.is_err() {
@@ -96,7 +96,7 @@ impl Command {
 
     pub async fn delete_movie(cx: UpdateWithCx<AutoSend<Bot>, Message>, api: Api, title: String, status: MovieDeleteStatus) -> anyhow::Result<Message> {
         let msg = if title == "" {
-            "`/delete` must be followed by a movie title you idiot".to_string()
+            "`/(delete|watch)` must be followed by a movie title you idiot".to_string()
         } else {
             match api.get_movie_by_title(&title).await? {
                 // TODO: also search through /movie (needs support from the api)
