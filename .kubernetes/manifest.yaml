@@ -1,56 +1,32 @@
-#apiVersion: batch/v1
-#kind: CronJob
-#metadata:
-#  name: timhatdiehandandermaus-bot
-#  namespace: timhatdiehandandermaus
-#spec:
-#  schedule: "*/30 * * * *"
-#  successfulJobsHistoryLimit: 1
-#  failedJobsHistoryLimit: 1
-#  jobTemplate:
-#    spec:
-#      backoffLimit: 0
-#      template:
-#        spec:
-#          containers:
-#          - name: scraper
-#            image: ghcr.io/tim-hat-die-hand-an-der-maus/telegram-bot:{{tag}}
-#envFrom:
-#  - secretRef:
-#      name: telegram-token
-#  - configMapRef:
-#      name: timhatdiehandandermaus-bot-config
-#          restartPolicy: Never
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: timhatdiehandandermaus-bot
+  name: telegram-bot
   namespace: timhatdiehandandermaus
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: timhatdiehandandermaus-bot
+      app: telegram-bot
   template:
     metadata:
       labels:
-        app: timhatdiehandandermaus-bot
+        app: telegram-bot
     spec:
       containers:
-        - name: timhatdiehandandermaus-bot
+        - name: telegram-bot
           image: ghcr.io/tim-hat-die-hand-an-der-maus/telegram-bot:{{tag}}
           imagePullPolicy: Always
           envFrom:
             - secretRef:
                 name: telegram-token
             - configMapRef:
-                name: timhatdiehandandermaus-bot-config
+                name: telegram-bot-config
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: timhatdiehandandermaus-bot-config
+  name: telegram-bot-config
   namespace: timhatdiehandandermaus
 data:
   BOT_NAME: "timhatdiehandandermausbot"
