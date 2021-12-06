@@ -29,9 +29,9 @@ metadata:
   name: telegram-bot-config
   namespace: timhatdiehandandermaus
 data:
-  BOT_NAME: "timhatdiehandandermausbot"
+  BOT_NAME: "watchqueuebot"
   BASE_URL: "http://api"
-  ADMIN_CHAT: "-766365181"
+  ADMIN_CHAT: "-1001556735505"
 ---
 apiVersion: v1
 kind: Secret
