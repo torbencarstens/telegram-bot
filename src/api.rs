@@ -89,6 +89,16 @@ impl Api {
             .map_err(|e| anyhow!("[  Api::get_movie[0]: failed to retrieve movie: {:?} ]", e))
     }
 
+    // has to be the exact title for now
+    pub async fn get_movie_by_title(&self, title: &String) -> anyhow::Result<Option<Movie>> {
+        Ok(self.queue().await?
+            .movies
+            .into_iter()
+            .filter_map(|movie| movie.ok())
+            .filter(|movie| &movie.imdb.title == title)
+            .next())
+    }
+
     pub async fn queue(&self) -> anyhow::Result<Movies> {
         let mut movies: Vec<anyhow::Result<anyhow::Result<Movie>>> = vec![];
         match self.get(ApiEndpoints::Queue.to_string())

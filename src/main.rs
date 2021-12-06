@@ -9,7 +9,7 @@ use tokio;
 use url::Url;
 
 use timhatdiehandandermaus::api::Api;
-use timhatdiehandandermaus::MovieDeleteStatus;
+use timhatdiehandandermaus::{Movie, MovieDeleteStatus};
 
 #[derive(Debug)]
 struct CommandTypeMovieRating {
@@ -52,10 +52,12 @@ enum Command {
     Queue,
     #[command(description = "rate movie (`/rate {id} {rating}`), rating can be a number between 0 - 10")]
     Rate(CommandTypeMovieRating),
-    #[command(description = "remove rating from movie (`/unrat {id}`)")]
+    #[command(description = "remove rating from movie (`/unrate {id}`)")]
     Unrate(String),
     #[command(description = "mark a movie as watched, this deletes the movie from the queue (`/watch {id}`)")]
     Watch(String),
+    #[command(description = "get a movie by title (has to be exact) (`/get {title}`)")]
+    Get(String),
 }
 
 impl Command {
@@ -119,7 +121,24 @@ impl Command {
         cx
             .answer(msg)
             .await
-            .map_err(|e| anyhow!("[ queue[3]: couldn't answer: {} ]", e))
+            .map_err(|e| anyhow!("[ queue[3]: couldn't answer: {:?} ]", e))
+    }
+
+    pub async fn get(cx: UpdateWithCx<AutoSend<Bot>, Message>, api: Api, title: String) -> anyhow::Result<Message> {
+        let msg = match api.
+            get_movie_by_title(&title)
+            .await {
+            Ok(value) => match value {
+                None => format!("{} couldn't be found in queue", title),
+                Some(movie) => movie.to_string(),
+            },
+            Err(error) => format!("[ get[2]: {:?} ]", error)
+        };
+
+        cx
+            .answer(msg)
+            .await
+            .map_err(|e| anyhow!("[ get[3]: couldn't answer: {:?} ]", e))
     }
 }
 
@@ -148,6 +167,7 @@ async fn answer(
         Command::Delete(movie_id) => Command::delete_movie(cx, api, movie_id, MovieDeleteStatus::Deleted).await?,
         Command::Queue => Command::queue(cx, api).await?,
         Command::Watch(movie_id) => Command::delete_movie(cx, api, movie_id, MovieDeleteStatus::Watched).await?,
+        Command::Get(title) => Command::get(cx, api, title).await?,
         command_name => {
             cx.answer(format!("{:#?} is not implemented yet.", command_name)).await?
         }
