@@ -99,10 +99,9 @@ impl Command {
             "`/delete` must be followed by a movie title you idiot".to_string()
         } else {
             match api.get_movie_by_title(&title).await? {
-                None => format!("couldn't find {} in queue", title),
+                // TODO: also search through /movie (needs support from the api)
+                None => format!("couldn't find '{}' in queue", title),
                 Some(movie) => {
-                    println!("found: {:#?}", movie);
-
                     match Command::wade_through("delete_movie", api.delete_movie(movie.id, status).await) {
                         Ok(value) => value,
                         Err(error) => format!("[ delete_movie[2]: {:?} ]", error)
