@@ -91,23 +91,30 @@ impl Command {
         cx
             .answer(msg)
             .await
-            .map_err(|e| anyhow!("[ add_movie[3]: couldn't answer: {} ]", e))
+            .map_err(|e| anyhow!("[ add_movie[3]: couldn't answer: {:?} ]", e))
     }
 
-    pub async fn delete_movie(cx: UpdateWithCx<AutoSend<Bot>, Message>, api: Api, movie_id: String, status: MovieDeleteStatus) -> anyhow::Result<Message> {
-        let msg = if movie_id == "" {
-            "`/deletemovie` must be followed by a movie ID you idiot".to_string()
+    pub async fn delete_movie(cx: UpdateWithCx<AutoSend<Bot>, Message>, api: Api, title: String, status: MovieDeleteStatus) -> anyhow::Result<Message> {
+        let msg = if title == "" {
+            "`/delete` must be followed by a movie title you idiot".to_string()
         } else {
-            match Command::wade_through("delete_movie", api.delete_movie(movie_id, status).await) {
-                Ok(value) => value,
-                Err(error) => format!("[ delete_movie[2]: {:?} ]", error)
+            match api.get_movie_by_title(&title).await? {
+                None => format!("couldn't find {} in queue", title),
+                Some(movie) => {
+                    println!("found: {:#?}", movie);
+
+                    match Command::wade_through("delete_movie", api.delete_movie(movie.id, status).await) {
+                        Ok(value) => value,
+                        Err(error) => format!("[ delete_movie[2]: {:?} ]", error)
+                    }
+                }
             }
         };
 
         cx
             .answer(msg)
             .await
-            .map_err(|e| anyhow!("[ delete_movie[3]: couldn't answer: {} ]", e))
+            .map_err(|e| anyhow!("[ delete_movie[3]: couldn't answer: {:?} ]", e))
     }
 
     pub async fn queue(cx: UpdateWithCx<AutoSend<Bot>, Message>, api: Api) -> anyhow::Result<Message> {
@@ -157,16 +164,15 @@ async fn answer(
         return Ok(());
     }
 
-
     match command {
         Command::Help => cx.answer(Command::descriptions()).await?,
         Command::WerHatDieHandAnDerMaus => {
             cx.answer(format!("Tim")).await?
         }
         Command::Add(imdb_url) => Command::add_movie(cx, api, imdb_url).await?,
-        Command::Delete(movie_id) => Command::delete_movie(cx, api, movie_id, MovieDeleteStatus::Deleted).await?,
+        Command::Delete(title) => Command::delete_movie(cx, api, title, MovieDeleteStatus::Deleted).await?,
         Command::Queue => Command::queue(cx, api).await?,
-        Command::Watch(movie_id) => Command::delete_movie(cx, api, movie_id, MovieDeleteStatus::Watched).await?,
+        Command::Watch(title) => Command::delete_movie(cx, api, title, MovieDeleteStatus::Watched).await?,
         Command::Get(title) => Command::get(cx, api, title).await?,
         command_name => {
             cx.answer(format!("{:#?} is not implemented yet.", command_name)).await?

@@ -69,7 +69,7 @@ pub struct QueueMovie {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Movie {
-    id: String,
+    pub id: String,
     imdb: ImdbMovie,
     status: MovieStatus,
 }
