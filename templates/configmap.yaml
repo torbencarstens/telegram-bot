@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configmap.name }}
+  namespace: {{ .Values.namespace }}
+data:
+  BOT_NAME: "{{ .Values.configmap.adminChat }}"
+  BASE_URL: "{{ .Values.configmap.adminChat }}"
+  ADMIN_CHAT: "{{ .Values.configmap.adminChat }}"
