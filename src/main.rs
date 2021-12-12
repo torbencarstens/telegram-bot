@@ -6,10 +6,11 @@ use std::str::FromStr;
 use anyhow::anyhow;
 use teloxide::{prelude::*, utils::command::BotCommand};
 use tokio;
+use tokio_stream::wrappers::UnboundedReceiverStream;
 use url::Url;
 
-use timhatdiehandandermaus::MovieDeleteStatus;
 use timhatdiehandandermaus::api::Api;
+use timhatdiehandandermaus::MovieDeleteStatus;
 
 #[derive(Debug)]
 struct CommandTypeMovieRating {
@@ -58,6 +59,8 @@ enum Command {
     Watch(String),
     #[command(description = "get a movie by title (has to be exact) (`/get {title}`)")]
     Get(String),
+    #[command(description = "noop")]
+    Noop,
 }
 
 impl Command {
@@ -143,7 +146,7 @@ impl Command {
     }
 }
 
-async fn answer(
+async fn answer (
     cx: UpdateWithCx<AutoSend<Bot>, Message>,
     command: Command,
     api: Api,
@@ -168,12 +171,20 @@ async fn answer(
         Command::Queue => Command::queue(cx, api).await?,
         Command::Watch(title) => Command::delete_movie(cx, api, title, MovieDeleteStatus::Watched).await?,
         Command::Get(title) => Command::get(cx, api, title).await?,
+        Command::Noop => { cx.answer("").await? }
         command_name => {
             cx.answer(format!("{:#?} is not implemented yet.", command_name)).await?
         }
     };
 
     Ok(())
+}
+
+fn parse_command(c: &str) -> anyhow::Result<Command> {
+    match BotCommand::parse(c, env::var("BOT_NAME")?) {
+        Ok(command) => Ok(command),
+        Err(e) => Err(anyhow!("{:?}", e)),
+    }
 }
 
 #[tokio::main]
@@ -183,9 +194,17 @@ async fn main() -> anyhow::Result<()> {
     log::info!("Starting {}...", bot_name);
     let bot = Bot::from_env().auto_send();
 
-    let api = Api::new(env::var("BASE_URL").unwrap_or("http://api".to_string()).parse()?);
-
-    teloxide::commands_repl(bot, bot_name, move |r, x| answer(r, x, api.clone())).await;
+    Dispatcher::new(bot)
+        .messages_handler(|rx: DispatcherHandlerRx<AutoSend<Bot>, Message>| {
+            UnboundedReceiverStream::new(rx).for_each_concurrent(None, |message| async move {
+                let api = Api::new(env::var("BASE_URL").unwrap_or("http://api".to_string()).parse().expect("BASE_URL is in the wrong format"));
+                let msg = message.update.clone();
+                let command = msg.text().unwrap_or("");
+                answer(message, parse_command(command).unwrap_or(Command::Noop), api).await;
+            })
+        })
+        .dispatch()
+        .await;
 
     Ok(())
 }

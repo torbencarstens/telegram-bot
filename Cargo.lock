@@ -1531,6 +1531,7 @@ dependencies = [
  "teloxide-core",
  "thiserror",
  "tokio",
+ "tokio-stream",
  "url",
 ]
 
