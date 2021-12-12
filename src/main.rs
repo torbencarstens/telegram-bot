@@ -8,8 +8,8 @@ use teloxide::{prelude::*, utils::command::BotCommand};
 use tokio;
 use url::Url;
 
+use timhatdiehandandermaus::MovieDeleteStatus;
 use timhatdiehandandermaus::api::Api;
-use timhatdiehandandermaus::{Movie, MovieDeleteStatus};
 
 #[derive(Debug)]
 struct CommandTypeMovieRating {
@@ -75,16 +75,11 @@ impl Command {
         let msg = if imdb_url == "" {
             "`/add` must be followed by an imdb URL you idiot".to_string()
         } else {
-            let url = Url::parse(imdb_url.as_str());
-            if url.is_err() {
-                format!("pass a valid URL you idiot: ({:?})", url.err().expect("impossible since `is_err` is checked before unwrapping `err()`"))
-            } else {
-                let url = url.expect("impossible since `!is_err()` was validated beforehand");
-
-                match Command::wade_through("add_movie", api.add_movie(url).await) {
-                    Ok(value) => value,
-                    Err(error) => format!("[ add_movie[2]: {:?} ]", error)
-                }
+            let url = Url::parse(imdb_url.as_str())
+                .map_err(|e| anyhow!("pass a valid URL you idiot: ({:?})", e))?;
+            match Command::wade_through("add_movie", api.add_movie(url).await) {
+                Ok(value) => value,
+                Err(error) => format!("[ add_movie[2]: {:?} ]", error)
             }
         };
 
