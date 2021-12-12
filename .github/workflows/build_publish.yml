@@ -13,6 +13,9 @@ jobs:
       - run: sed -i -e "s#__TAG__#${GITHUB_SHA}#g" values.yaml
       - uses: WyriHaximus/github-action-helm3@v2
         with:
+          exec: helm lint
+      - uses: WyriHaximus/github-action-helm3@v2
+        with:
           exec: helm lint --strict
 
   build_push_docker:
