@@ -4,6 +4,6 @@ metadata:
   name: {{ .Values.configmap.name }}
   namespace: {{ .Values.namespace }}
 data:
-  BOT_NAME: "{{ .Values.configmap.adminChat }}"
-  BASE_URL: "{{ .Values.configmap.adminChat }}"
+  BOT_NAME: "{{ .Values.configmap.botName }}"
+  BASE_URL: "{{ .Values.configmap.baseUrl }}"
   ADMIN_CHAT: "{{ .Values.configmap.adminChat }}"
