@@ -4,7 +4,6 @@ use std::fmt::{self, Debug};
 use std::str::FromStr;
 
 use anyhow::anyhow;
-use chrono::{Datelike, DateTime, Local, NaiveDate, TimeZone, Weekday};
 use teloxide::{prelude::*, utils::command::BotCommand};
 use teloxide_core::types::PollType;
 use tokio;
@@ -150,17 +149,6 @@ impl Command {
     }
 }
 
-// sunday evening 20:00 (UTC)
-fn get_next_poll_closing_time() -> DateTime<Local> {
-    let now = chrono::offset::Local::now();
-    let year = now.year();
-    let week = now.iso_week().week();
-
-    let naive = NaiveDate::from_isoywd(year, week, Weekday::Sun)
-        .and_hms(20, 00, 00);
-    Local.from_local_datetime(&naive).unwrap()
-}
-
 async fn send_movie_poll(api: Api, bot: &Bot, chat_id: i64) -> anyhow::Result<Message> {
     let question = "Which movie do you want to watch?";
     let mut options = match api.queue().await {
@@ -189,11 +177,9 @@ async fn send_movie_poll(api: Api, bot: &Bot, chat_id: i64) -> anyhow::Result<Me
         .collect();
     options.append(&mut default_options);
 
-    let close_time = get_next_poll_closing_time();
     Ok(bot
         .send_poll(chat_id, question, options, PollType::Regular)
         .is_anonymous(false)
-        .close_date(close_time)
         .send()
         .await?)
 }
