@@ -7,3 +7,4 @@ data:
   BOT_NAME: "{{ .Values.configmap.botName }}"
   BASE_URL: "{{ .Values.configmap.baseUrl }}"
   ADMIN_CHAT: "{{ .Values.configmap.adminChat }}"
+  POLL_DEFAULT_OPTIONS: "{{ .Values.poll.defaultOptions }}"

@@ -35,6 +35,9 @@ cronjob:
     cpu: 300m
     memory: 300Mi
 
+poll:
+  defaultOptions: "Nicht dabei,Mir egal"
+
 configmap:
   name: telegram-bot-config
   botName: "watchqueuebot"

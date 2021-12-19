@@ -182,7 +182,11 @@ async fn send_movie_poll(api: Api, bot: &Bot, chat_id: i64) -> anyhow::Result<Me
         Err(anyhow!(msg))?
     }
 
-    let mut default_options = vec![String::from("Nicht dabei"), String::from("Mir egal")];
+    let mut default_options = env::var("POLL_DEFAULT_OPTIONS")
+        .unwrap_or(String::from("Nicht dabei,Mir egal"))
+        .split(",")
+        .map(|s| s.trim().into())
+        .collect();
     options.append(&mut default_options);
 
     let close_time = get_next_poll_closing_time();
