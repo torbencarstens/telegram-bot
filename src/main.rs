@@ -161,6 +161,39 @@ fn get_next_poll_closing_time() -> DateTime<Local> {
     Local.from_local_datetime(&naive).unwrap()
 }
 
+async fn send_movie_poll(api: Api, bot: &Bot, chat_id: i64) -> anyhow::Result<Message> {
+    let question = "Which movie do you want to watch?";
+    let mut options = match api.queue().await {
+        Ok(value) => value
+            .movies
+            .into_iter()
+            // TODO: throw some kind of error for this
+            .filter_map(|item| item.ok())
+            .map(|movie| movie.to_string())
+            .collect(),
+        Err(err) => {
+            bot.send_message(chat_id, format!("Failed to retrieve movies: {:#?}", err));
+            vec![]
+        }
+    };
+    if options.len() == 0 {
+        let msg = "poll: no movies in queue (or error decoding individual ones)";
+        bot.send_message(chat_id, msg);
+        Err(anyhow!(msg))?
+    }
+
+    let mut default_options = vec![String::from("Nicht dabei"), String::from("Mir egal")];
+    options.append(&mut default_options);
+
+    let close_time = get_next_poll_closing_time();
+    Ok(bot
+        .send_poll(chat_id, question, options, PollType::Regular)
+        .is_anonymous(false)
+        .close_date(close_time)
+        .send()
+        .await?)
+}
+
 async fn answer(
     cx: UpdateWithCx<AutoSend<Bot>, Message>,
     command: Command,
@@ -186,40 +219,7 @@ async fn answer(
         Command::Queue => Command::queue(cx, api).await?,
         Command::Watch(title) => Command::delete_movie(cx, api, title, MovieDeleteStatus::Watched).await?,
         Command::Get(title) => Command::get(cx, api, title).await?,
-        Command::Poll => {
-            let question = "Which movie do you want to watch?";
-            let mut options = match api.queue().await {
-                Ok(value) => value
-                    .movies
-                    .into_iter()
-                    // TODO: throw some kind of error for this
-                    .filter_map(|item| item.ok())
-                    .map(|movie| movie.to_string())
-                    .collect(),
-                Err(err) => {
-                    cx.answer(format!("Failed to retrieve movies: {:#?}", err));
-                    vec![]
-                }
-            };
-            if options.len() == 0 {
-                let msg = "poll: no movies in queue (or error decoding individual ones)";
-                cx.answer(msg);
-                Err(anyhow!(msg))?
-            }
-
-            let mut default_options = vec![String::from("Nicht dabei"), String::from("Mir egal")];
-            options.append(&mut default_options);
-
-            let close_time = get_next_poll_closing_time();
-            cx
-                .requester
-                .inner()
-                .send_poll(cx.update.chat_id(), question, options, PollType::Regular)
-                .is_anonymous(false)
-                .close_date(close_time)
-                .send()
-                .await?
-        }
+        Command::Poll => send_movie_poll(api.clone(), cx.requester.inner(), cx.update.chat_id()).await?,
         Command::Noop => { cx.answer("").await? }
         command_name => {
             cx.answer(format!("{:#?} is not implemented yet.", command_name)).await?
@@ -242,6 +242,13 @@ async fn main() -> anyhow::Result<()> {
     let bot_name = env::var("BOT_NAME")?;
     log::info!("Starting {}...", bot_name);
     let bot = Bot::from_env().auto_send();
+
+    if env::args().any(|arg| arg.to_lowercase() == String::from("poll")) {
+        let api = Api::new(env::var("BASE_URL").unwrap_or("http://api".to_string()).parse().expect("BASE_URL is in the wrong format"));
+        println!("{:#?}", send_movie_poll(api, bot.inner(), env::var("ADMIN_CHAT").expect("`ADMIN_CHAT` has to be set").parse::<i64>()?).await?);
+
+        return Ok(());
+    }
 
     Dispatcher::new(bot)
         .messages_handler(|rx: DispatcherHandlerRx<AutoSend<Bot>, Message>| {

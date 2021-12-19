@@ -15,6 +15,25 @@ deployment:
     cpu: 300m
     memory: 300Mi
 
+cronjob:
+  name: telegram-bot-which-movie-poll
+  image: ghcr.io/tim-hat-die-hand-an-der-maus/telegram-bot:__TAG__
+  imagePullPolicy: Always
+  command: [ '"/app/timhatdiehandandermaus"' ]
+  args: [ '"poll"' ]
+  schedule: "CRON_TZ=Europe/Zurich 0 20 * * */5"
+  backoffLimit: 0
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  labels:
+    app: telegram-bot-poll
+  requests:
+    cpu: 100m
+    memory: 100Mi
+  limit:
+    cpu: 300m
+    memory: 300Mi
+
 configmap:
   name: telegram-bot-config
   botName: "watchqueuebot"
