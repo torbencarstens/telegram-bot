@@ -203,7 +203,6 @@ async fn answer(
             };
 
             let close_time = get_next_poll_closing_time();
-            println!("{:#?}", close_time);
             cx
                 .requester
                 .inner()
