@@ -25,6 +25,7 @@ cronjob:
   backoffLimit: 0
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
+  restartPolicy: Never
   labels:
     app: telegram-bot-poll
   requests:
