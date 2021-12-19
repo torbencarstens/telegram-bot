@@ -45,7 +45,7 @@ WORKDIR /app
 COPY --from=builder /app/target/release/timhatdiehandandermaus /app/timhatdiehandandermaus
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-ENV TZ Europe/Zurich
+ENV TZ Europe/Berlin
 
 # Use an unprivileged user.
 USER worker:worker
