@@ -18,7 +18,7 @@ deployment:
 configmap:
   name: telegram-bot-config
   botName: "watchqueuebot"
-  baseUrl: "http://api"
+  baseUrl: "https://api.timhatdiehandandermaus.consulting"
   adminChat: "-1001556735505"
 
 secret:
