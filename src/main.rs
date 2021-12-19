@@ -4,7 +4,7 @@ use std::fmt::{self, Debug};
 use std::str::FromStr;
 
 use anyhow::anyhow;
-use chrono::{Datelike, DateTime, Local, NaiveDate, NaiveDateTime, TimeZone, Weekday};
+use chrono::{Datelike, DateTime, Local, NaiveDate, TimeZone, Weekday};
 use teloxide::{prelude::*, utils::command::BotCommand};
 use teloxide_core::types::PollType;
 use tokio;
@@ -188,7 +188,7 @@ async fn answer(
         Command::Get(title) => Command::get(cx, api, title).await?,
         Command::Poll => {
             let question = "Which movie do you want to watch?";
-            let options = match api.queue().await {
+            let mut options = match api.queue().await {
                 Ok(value) => value
                     .movies
                     .into_iter()
@@ -201,6 +201,14 @@ async fn answer(
                     vec![]
                 }
             };
+            if options.len() == 0 {
+                let msg = "poll: no movies in queue (or error decoding individual ones)";
+                cx.answer(msg);
+                Err(anyhow!(msg))?
+            }
+
+            let mut default_options = vec![String::from("Nicht dabei"), String::from("Mir egal")];
+            options.append(&mut default_options);
 
             let close_time = get_next_poll_closing_time();
             cx
@@ -241,7 +249,7 @@ async fn main() -> anyhow::Result<()> {
                 let api = Api::new(env::var("BASE_URL").unwrap_or("http://api".to_string()).parse().expect("BASE_URL is in the wrong format"));
                 let msg = message.update.clone();
                 let command = msg.text().unwrap_or("");
-                answer(message, parse_command(command).unwrap_or(Command::Noop), api).await;
+                println!("{:#?}", answer(message, parse_command(command).unwrap_or(Command::Noop), api).await);
             })
         })
         .dispatch()
