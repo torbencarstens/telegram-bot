@@ -21,7 +21,7 @@ cronjob:
   imagePullPolicy: Always
   command: [ '"/app/timhatdiehandandermaus"' ]
   args: [ '"poll"' ]
-  schedule: "CRON_TZ=CET 0 20 * * */5"
+  schedule: "CRON_TZ=UTC 0 20 * * */5"
   backoffLimit: 0
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
