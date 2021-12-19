@@ -4,7 +4,9 @@ use std::fmt::{self, Debug};
 use std::str::FromStr;
 
 use anyhow::anyhow;
+use chrono::{Datelike, DateTime, Local, NaiveDate, NaiveDateTime, TimeZone, Weekday};
 use teloxide::{prelude::*, utils::command::BotCommand};
+use teloxide_core::types::PollType;
 use tokio;
 use tokio_stream::wrappers::UnboundedReceiverStream;
 use url::Url;
@@ -59,6 +61,8 @@ enum Command {
     Watch(String),
     #[command(description = "get a movie by title (has to be exact) (`/get {title}`)")]
     Get(String),
+    #[command(description = "send poll to choose movie to watch")]
+    Poll,
     #[command(description = "noop")]
     Noop,
 }
@@ -146,7 +150,18 @@ impl Command {
     }
 }
 
-async fn answer (
+// sunday evening 20:00 (UTC)
+fn get_next_poll_closing_time() -> DateTime<Local> {
+    let now = chrono::offset::Local::now();
+    let year = now.year();
+    let week = now.iso_week().week();
+
+    let naive = NaiveDate::from_isoywd(year, week, Weekday::Sun)
+        .and_hms(20, 00, 00);
+    Local.from_local_datetime(&naive).unwrap()
+}
+
+async fn answer(
     cx: UpdateWithCx<AutoSend<Bot>, Message>,
     command: Command,
     api: Api,
@@ -171,6 +186,33 @@ async fn answer (
         Command::Queue => Command::queue(cx, api).await?,
         Command::Watch(title) => Command::delete_movie(cx, api, title, MovieDeleteStatus::Watched).await?,
         Command::Get(title) => Command::get(cx, api, title).await?,
+        Command::Poll => {
+            let question = "Which movie do you want to watch?";
+            let options = match api.queue().await {
+                Ok(value) => value
+                    .movies
+                    .into_iter()
+                    // TODO: throw some kind of error for this
+                    .filter_map(|item| item.ok())
+                    .map(|movie| movie.to_string())
+                    .collect(),
+                Err(err) => {
+                    cx.answer(format!("Failed to retrieve movies: {:#?}", err));
+                    vec![]
+                }
+            };
+
+            let close_time = get_next_poll_closing_time();
+            println!("{:#?}", close_time);
+            cx
+                .requester
+                .inner()
+                .send_poll(cx.update.chat_id(), question, options, PollType::Regular)
+                .is_anonymous(false)
+                .close_date(close_time)
+                .send()
+                .await?
+        }
         Command::Noop => { cx.answer("").await? }
         command_name => {
             cx.answer(format!("{:#?} is not implemented yet.", command_name)).await?
