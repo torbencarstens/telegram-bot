@@ -41,7 +41,7 @@ poll:
 configmap:
   name: telegram-bot-config
   botName: "watchqueuebot"
-  baseUrl: "https://api.timhatdiehandandermaus.consulting"
+  baseUrl: "http://api"
   adminChat: "-1001556735505"
 
 secret:
