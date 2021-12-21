@@ -180,6 +180,7 @@ async fn send_movie_poll(api: Api, bot: &Bot, chat_id: i64) -> anyhow::Result<Me
     Ok(bot
         .send_poll(chat_id, question, options, PollType::Regular)
         .is_anonymous(false)
+        .allows_multiple_answers(true)
         .send()
         .await?)
 }
