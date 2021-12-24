@@ -151,6 +151,14 @@ impl Command {
 
 async fn send_movie_poll(api: Api, bot: &Bot, chat_id: i64) -> anyhow::Result<Message> {
     let question = "Which movie do you want to watch?";
+
+    let mut default_options = env::var("POLL_DEFAULT_OPTIONS")
+        .unwrap_or(String::from("Nicht dabei,Mir egal"))
+        .split(",")
+        .map(|s| s.trim().into())
+        .collect::<Vec<String>>();
+
+    let options_count = 10 - default_options.len();
     let mut options = match api.queue().await {
         Ok(value) => value
             .movies
@@ -158,6 +166,8 @@ async fn send_movie_poll(api: Api, bot: &Bot, chat_id: i64) -> anyhow::Result<Me
             // TODO: throw some kind of error for this
             .filter_map(|item| item.ok())
             .map(|movie| movie.to_string())
+            .take(options_count)
+            .chain(default_options)
             .collect(),
         Err(err) => {
             bot.send_message(chat_id, format!("Failed to retrieve movies: {:#?}", err));
@@ -169,13 +179,6 @@ async fn send_movie_poll(api: Api, bot: &Bot, chat_id: i64) -> anyhow::Result<Me
         bot.send_message(chat_id, msg);
         Err(anyhow!(msg))?
     }
-
-    let mut default_options = env::var("POLL_DEFAULT_OPTIONS")
-        .unwrap_or(String::from("Nicht dabei,Mir egal"))
-        .split(",")
-        .map(|s| s.trim().into())
-        .collect();
-    options.append(&mut default_options);
 
     Ok(bot
         .send_poll(chat_id, question, options, PollType::Regular)
