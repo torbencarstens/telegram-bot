@@ -13,6 +13,8 @@ use url::Url;
 use timhatdiehandandermaus::api::Api;
 use timhatdiehandandermaus::MovieDeleteStatus;
 
+static POLL_MAX_OPTIONS_COUNT: u8 = 10;
+
 #[derive(Debug)]
 struct CommandTypeMovieRating {
     movie_id: String,
@@ -158,7 +160,7 @@ async fn send_movie_poll(api: Api, bot: &Bot, chat_id: i64) -> anyhow::Result<Me
         .map(|s| s.trim().into())
         .collect::<Vec<String>>();
 
-    let options_count = 10 - default_options.len();
+    let options_count = POLL_MAX_OPTIONS_COUNT - default_options.len();
     let mut options = match api.queue().await {
         Ok(value) => value
             .movies
