@@ -13,7 +13,7 @@ use url::Url;
 use timhatdiehandandermaus::api::Api;
 use timhatdiehandandermaus::MovieDeleteStatus;
 
-static POLL_MAX_OPTIONS_COUNT: u8 = 10;
+static POLL_MAX_OPTIONS_COUNT: usize = 10;
 
 #[derive(Debug)]
 struct CommandTypeMovieRating {
