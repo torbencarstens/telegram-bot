@@ -2,6 +2,11 @@
 name = "timhatdiehandandermaus"
 version = "0.1.0"
 edition = "2021"
+authors = ["timhatdiehandandermaus@carstens.tech"]
+license = "MIT"
+repository = "https://github.com/tim-hat-die-hand-an-der-maus/telegram-bot"
+homepage = "https://github.com/tim-hat-die-hand-an-der-maus/telegram-bot"
+categories = []
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -13,18 +18,18 @@ name = "timhatdiehandandermaus"
 
 [dependencies]
 anyhow = "1.0.52"
-teloxide = { version = "0.5.3", features = ["macros", "auto-send"] }
+teloxide = { version = "0.5.3", features = ["macros", "auto-send", "native-tls"], default-features = false }
 tokio = { version = "1.15.0", features = ["rt-multi-thread", "macros"] }
-log = "0.4.8"
-pretty_env_logger = "0.4.0"
-thiserror = "1.0.30"
-reqwest = { version = "0.11.8", features=["blocking"] }
-url = "2.2.2"
-serde = "1.0.133"
-serde_json = "1.0.74"
-serde_derive = "1.0.133"
-teloxide-core = "0.3.4"
-futures = "0.3.19"
-futures-util = "0.3.19"
+log = { version = "0.4.8", default-features = false }
+pretty_env_logger = { version = "0.4.0", default-features = false }
+thiserror = { version = "1.0.30", default-features = false }
+reqwest = { version = "0.11.8", features=["blocking", "default-tls"], default-features = false }
+url = { version = "2.2.2", default-features = false }
+serde = { version = "1.0.133", features = ["std"], default-features = false }
+serde_json = { version = "1.0.74", features=["raw_value"], default-features = false }
+serde_derive = { version = "1.0.133", default-features=false }
+teloxide-core = { version = "0.3.4", features=["native-tls"], default-features = false } # rustls
+futures = { version = "0.3.19", features=["std", "async-await", "executor"], default-features = false }
+futures-util = { version = "0.3.19", features=["std", "async-await", "async-await-macro"], default-features = false }
 async-std = "1.10.0"
-tokio-stream = "0.1.8"
+tokio-stream = { version = "0.1.8", features=["time"], default-features = false }
