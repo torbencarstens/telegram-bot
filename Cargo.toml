@@ -27,7 +27,7 @@ reqwest = { version = "0.11.9", features=["blocking", "default-tls"], default-fe
 url = { version = "2.2.2", default-features = false }
 serde = { version = "1.0.133", features = ["std"], default-features = false }
 serde_json = { version = "1.0.75", features=["raw_value"], default-features = false }
-serde_derive = { version = "1.0.133", default-features=false }
+serde_derive = { version = "1.0.134", default-features=false }
 teloxide-core = { version = "0.3.4", features=["native-tls"], default-features = false } # rustls
 futures = { version = "0.3.19", features=["std", "async-await", "executor"], default-features = false }
 futures-util = { version = "0.3.19", features=["std", "async-await", "async-await-macro"], default-features = false }
