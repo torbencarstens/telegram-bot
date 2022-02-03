@@ -5,7 +5,7 @@ use std::str::FromStr;
 
 use anyhow::anyhow;
 use teloxide::{prelude::*, utils::command::BotCommand};
-use teloxide_core::types::PollType;
+use teloxide::types::PollType;
 use tokio;
 use tokio_stream::wrappers::UnboundedReceiverStream;
 use url::Url;
