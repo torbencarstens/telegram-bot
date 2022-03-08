@@ -1,13 +1,10 @@
 use std::env;
-use std::error::Error;
 use std::fmt::{self, Debug};
 use std::str::FromStr;
 
 use anyhow::anyhow;
-use teloxide::{prelude::*, utils::command::BotCommand};
-use teloxide::types::PollType;
+use teloxide::{prelude2::*, utils::command::BotCommand};
 use tokio;
-use tokio_stream::wrappers::UnboundedReceiverStream;
 use url::Url;
 
 use timhatdiehandandermaus::api::Api;
@@ -15,7 +12,7 @@ use timhatdiehandandermaus::MovieDeleteStatus;
 
 static POLL_MAX_OPTIONS_COUNT: usize = 10;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 struct CommandTypeMovieRating {
     movie_id: String,
     rating: u8,
@@ -41,7 +38,7 @@ impl TryFrom<Vec<&str>> for CommandTypeMovieRating {
     }
 }
 
-#[derive(BotCommand, Debug)]
+#[derive(BotCommand, Clone, Debug)]
 #[command(rename = "lowercase", description = "These commands are supported:")]
 enum Command {
     #[command(description = "help")]
@@ -79,7 +76,7 @@ impl Command {
         }
     }
 
-    pub async fn add_movie(cx: UpdateWithCx<AutoSend<Bot>, Message>, api: Api, imdb_url: String) -> Result<Message, anyhow::Error> {
+    pub async fn add_movie(bot: AutoSend<Bot>, message: Message, api: Api, imdb_url: String) -> Result<Message, anyhow::Error> {
         let msg = if imdb_url == "" {
             "`/add` must be followed by an imdb URL you idiot".to_string()
         } else {
@@ -91,13 +88,13 @@ impl Command {
             }
         };
 
-        cx
-            .answer(msg)
+        bot
+            .send_message(message.chat.id, msg)
             .await
             .map_err(|e| anyhow!("[ add_movie[3]: couldn't answer: {:?} ]", e))
     }
 
-    pub async fn delete_movie(cx: UpdateWithCx<AutoSend<Bot>, Message>, api: Api, title: String, status: MovieDeleteStatus) -> anyhow::Result<Message> {
+    pub async fn delete_movie(bot: AutoSend<Bot>, message: Message, api: Api, title: String, status: MovieDeleteStatus) -> anyhow::Result<Message> {
         let msg = if title == "" {
             "`/(delete|watch)` must be followed by a movie title you idiot".to_string()
         } else {
@@ -113,13 +110,13 @@ impl Command {
             }
         };
 
-        cx
-            .answer(msg)
+        bot
+            .send_message(message.chat.id, msg)
             .await
             .map_err(|e| anyhow!("[ delete_movie[3]: couldn't answer: {:?} ]", e))
     }
 
-    pub async fn queue(cx: UpdateWithCx<AutoSend<Bot>, Message>, api: Api) -> anyhow::Result<Message> {
+    pub async fn queue(bot: AutoSend<Bot>, message: Message, api: Api) -> anyhow::Result<Message> {
         let msg = match Command::wade_through("queue", Ok(api
             .queue()
             .await)) {
@@ -127,13 +124,13 @@ impl Command {
             Err(error) => format!("[ queue[2]: {:?} ]", error)
         };
 
-        cx
-            .answer(msg)
+        bot
+            .send_message(message.chat.id, msg)
             .await
             .map_err(|e| anyhow!("[ queue[3]: couldn't answer: {:?} ]", e))
     }
 
-    pub async fn get(cx: UpdateWithCx<AutoSend<Bot>, Message>, api: Api, title: String) -> anyhow::Result<Message> {
+    pub async fn get(bot: AutoSend<Bot>, message: Message, api: Api, title: String) -> anyhow::Result<Message> {
         let msg = match api.
             get_movie_by_title(&title)
             .await {
@@ -144,8 +141,8 @@ impl Command {
             Err(error) => format!("[ get[2]: {:?} ]", error)
         };
 
-        cx
-            .answer(msg)
+        bot
+            .send_message(message.chat.id, msg)
             .await
             .map_err(|e| anyhow!("[ get[3]: couldn't answer: {:?} ]", e))
     }
@@ -191,45 +188,35 @@ async fn send_movie_poll(api: Api, bot: &Bot, chat_id: i64) -> anyhow::Result<Me
 }
 
 async fn answer(
-    cx: UpdateWithCx<AutoSend<Bot>, Message>,
+    message: Message,
+    bot: AutoSend<Bot>,
     command: Command,
     api: Api,
-) -> Result<(), Box<dyn Error + Send + Sync>> {
+) -> anyhow::Result<()> {
     log::info!("{:?}", command);
 
     // TODO: This should be assembled from members of the group at some point (talk to API for that)
-    if cx.update.chat.id != env::var("ADMIN_CHAT")?.parse::<i64>()? {
-        cx.answer("You're not allowed to use this bot.").await?;
-        log::info!("{} ([u]{:?} | [f]{:?} | [l]{:?} | [t]{:?}) is not allowed to use this bot", cx.update.chat.id, cx.update.chat.username(), cx.update.chat.first_name(), cx.update.chat.last_name(), cx.update.chat.title());
+    if message.chat.id != env::var("ADMIN_CHAT")?.parse::<i64>()? {
+        bot.send_message(message.chat.id, "You're not allowed to use this bot.").await?;
+        log::info!("{} ([u]{:?} | [f]{:?} | [l]{:?} | [t]{:?}) is not allowed to use this bot", message.chat.id, message.chat.username(), message.chat.first_name(), message.chat.last_name(), message.chat.title());
 
         return Ok(());
     }
 
     match command {
-        Command::Help => cx.answer(Command::descriptions()).await?,
-        Command::WerHatDieHandAnDerMaus => {
-            cx.answer(format!("Tim")).await?
-        }
-        Command::Add(imdb_url) => Command::add_movie(cx, api, imdb_url).await?,
-        Command::Delete(title) => Command::delete_movie(cx, api, title, MovieDeleteStatus::Deleted).await?,
-        Command::Queue => Command::queue(cx, api).await?,
-        Command::Watch(title) => Command::delete_movie(cx, api, title, MovieDeleteStatus::Watched).await?,
-        Command::Get(title) => Command::get(cx, api, title).await?,
-        Command::Poll => send_movie_poll(api.clone(), cx.requester.inner(), cx.update.chat_id()).await?,
-        Command::Noop => { cx.answer("").await? }
-        command_name => {
-            cx.answer(format!("{:#?} is not implemented yet.", command_name)).await?
-        }
+        Command::Help => bot.send_message(message.chat.id, Command::descriptions()).await?,
+        Command::WerHatDieHandAnDerMaus => bot.send_message(message.chat.id, format!("Tim")).await?,
+        Command::Add(imdb_url) => Command::add_movie(bot, message, api, imdb_url).await?,
+        Command::Delete(title) => Command::delete_movie(bot, message, api, title, MovieDeleteStatus::Deleted).await?,
+        Command::Queue => Command::queue(bot, message, api).await?,
+        Command::Watch(title) => Command::delete_movie(bot, message, api, title, MovieDeleteStatus::Watched).await?,
+        Command::Get(title) => Command::get(bot, message, api, title).await?,
+        Command::Poll => send_movie_poll(api.clone(), bot.inner(), message.chat.id).await?,
+        Command::Noop => bot.send_message(message.chat.id, "").await?,
+        command_name => bot.send_message(message.chat.id, format!("{:#?} is not implemented yet.", command_name)).await?,
     };
 
     Ok(())
-}
-
-fn parse_command(c: &str) -> anyhow::Result<Command> {
-    match BotCommand::parse(c, env::var("BOT_NAME")?) {
-        Ok(command) => Ok(command),
-        Err(e) => Err(anyhow!("{:?}", e)),
-    }
 }
 
 #[tokio::main]
@@ -246,15 +233,24 @@ async fn main() -> anyhow::Result<()> {
         return Ok(());
     }
 
-    Dispatcher::new(bot)
-        .messages_handler(|rx: DispatcherHandlerRx<AutoSend<Bot>, Message>| {
-            UnboundedReceiverStream::new(rx).for_each_concurrent(None, |message| async move {
-                let api = Api::new(env::var("BASE_URL").unwrap_or("http://api".to_string()).parse().expect("BASE_URL is in the wrong format"));
-                let msg = message.update.clone();
-                let command = msg.text().unwrap_or("");
-                println!("{:#?}", answer(message, parse_command(command).unwrap_or(Command::Noop), api).await);
-            })
+    let handler = Update::filter_message()
+        .branch(
+            dptree::entry()
+                .filter_command::<Command>()
+                .endpoint(answer),
+        );
+
+    let api = Api::new(env::var("BASE_URL").unwrap_or("http://api".to_string()).parse().expect("BASE_URL is in the wrong format"));
+    Dispatcher::builder(bot, handler)
+        .dependencies(dptree::deps![api])
+        .default_handler(|update| async move {
+            log::warn!("Unhandler update: {:?}", update)
         })
+        .error_handler(LoggingErrorHandler::with_custom_text(
+            "An error has occured in the dispatcher",
+        ))
+        .build()
+        .setup_ctrlc_handler()
         .dispatch()
         .await;
 
