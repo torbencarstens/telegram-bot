@@ -1,10 +1,12 @@
 use std::env;
+use std::error::Error;
 use std::fmt::{self, Debug};
 use std::str::FromStr;
 
 use anyhow::anyhow;
 use teloxide::{prelude2::*, utils::command::BotCommand};
 use tokio;
+use tokio_stream::StreamExt;
 use url::Url;
 
 use timhatdiehandandermaus::api::Api;
@@ -218,6 +220,12 @@ async fn answer(
 
     Ok(())
 }
+async fn inline_query_handler(
+    query: InlineQuery,
+    bot: AutoSend<Bot>,
+) -> anyhow::Result<()> {
+    Ok(())
+}
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -233,12 +241,15 @@ async fn main() -> anyhow::Result<()> {
         return Ok(());
     }
 
-    let handler = Update::filter_message()
-        .branch(
-            dptree::entry()
-                .filter_command::<Command>()
-                .endpoint(answer),
-        );
+    let handler = dptree::entry()
+        .branch(Update::filter_message()
+            .branch(
+                dptree::entry()
+                    .filter_command::<Command>()
+                    .endpoint(answer)
+            )
+        )
+        .branch(Update::filter_inline_query().endpoint(inline_query_handler));
 
     let api = Api::new(env::var("BASE_URL").unwrap_or("http://api".to_string()).parse().expect("BASE_URL is in the wrong format"));
     Dispatcher::builder(bot, handler)
