@@ -1,12 +1,11 @@
 use std::env;
-use std::error::Error;
 use std::fmt::{self, Debug};
 use std::str::FromStr;
 
 use anyhow::anyhow;
 use teloxide::{prelude2::*, utils::command::BotCommand};
+use teloxide_core::types::{InlineQuery, InlineQueryResultArticle, InputMessageContent, InputMessageContentText};
 use tokio;
-use tokio_stream::StreamExt;
 use url::Url;
 
 use timhatdiehandandermaus::api::Api;
