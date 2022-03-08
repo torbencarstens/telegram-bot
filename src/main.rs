@@ -169,13 +169,13 @@ async fn send_movie_poll(api: Api, bot: &Bot, chat_id: i64) -> anyhow::Result<Me
             .chain(default_options)
             .collect(),
         Err(err) => {
-            bot.send_message(chat_id, format!("Failed to retrieve movies: {:#?}", err));
+            bot.send_message(chat_id, format!("Failed to retrieve movies: {:#?}", err)).await;
             vec![]
         }
     };
     if options.len() == 0 {
         let msg = "poll: no movies in queue (or error decoding individual ones)";
-        bot.send_message(chat_id, msg);
+        bot.send_message(chat_id, msg).await;
         Err(anyhow!(msg))?
     }
 
