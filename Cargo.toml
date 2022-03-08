@@ -23,13 +23,13 @@ tokio = { version = "1.17.0", features = ["rt-multi-thread", "macros"] }
 log = { version = "0.4.8", default-features = false }
 pretty_env_logger = { version = "0.4.0", default-features = false }
 thiserror = { version = "1.0.30", default-features = false }
-reqwest = { version = "0.11.9", features=["blocking", "default-tls"], default-features = false }
+reqwest = { version = "0.11.9", features = ["blocking", "default-tls"], default-features = false }
 url = { version = "2.2.2", default-features = false }
 serde = { version = "1.0.136", features = ["std"], default-features = false }
-serde_derive = { version = "1.0.136", default-features=false }
-serde_json = { version = "1.0.79", features=["raw_value"], default-features = false }
-teloxide-core = { version = "0.4.0", features=["native-tls"], default-features = false } # rustls
-futures = { version = "0.3.21", features=["std", "async-await", "executor"], default-features = false }
-futures-util = { version = "0.3.21", features=["std", "async-await", "async-await-macro"], default-features = false }
+serde_derive = { version = "1.0.136", default-features = false }
+serde_json = { version = "1.0.79", features = ["raw_value"], default-features = false }
+teloxide-core = { version = "0.4.3", features = ["native-tls"], default-features = false } # rustls
+futures = { version = "0.3.21", features = ["std", "async-await", "executor"], default-features = false }
+futures-util = { version = "0.3.21", features = ["std", "async-await", "async-await-macro"], default-features = false }
 async-std = "1.10.0"
-tokio-stream = { version = "0.1.8", features=["time"], default-features = false }
+tokio-stream = { version = "0.1.8", features = ["time"], default-features = false }
