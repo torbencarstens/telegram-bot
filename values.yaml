@@ -36,7 +36,7 @@ cronjob:
     memory: 300Mi
 
 poll:
-  defaultOptions: "Nicht dabei,Mir egal"
+  defaultOptions: "Mir egal"
 
 configmap:
   name: telegram-bot-config
