@@ -149,17 +149,38 @@ impl Command {
     }
 }
 
+async fn send_poll<S: Into<String>, V: IntoIterator<Item=String>>(question: S, options: V, allow_multiple_answers: bool, is_anonymous: bool, bot: &Bot, chat_id: i64) -> anyhow::Result<Message> {
+    Ok(bot
+        .send_poll(chat_id, question, options)
+        .is_anonymous(is_anonymous)
+        .allows_multiple_answers(allow_multiple_answers)
+        .send()
+        .await?)
+}
+
+async fn send_participation_poll(bot: &Bot, chat_id: i64) -> anyhow::Result<Message> {
+    let question = "Ich bin";
+
+    let options = env::var("PARTICIPATION_POLL_DEFAULT_OPTIONS")
+        .unwrap_or("Dabei,Nicht dabei,Spontan".to_string())
+        .split(",")
+        .map(|s| s.trim().into())
+        .collect::<Vec<String>>();
+
+    send_poll(question, options, false, false, bot, chat_id).await
+}
+
 async fn send_movie_poll(api: Api, bot: &Bot, chat_id: i64) -> anyhow::Result<Message> {
     let question = "Which movie do you want to watch?";
 
-    let mut default_options = env::var("POLL_DEFAULT_OPTIONS")
+    let default_options = env::var("POLL_DEFAULT_OPTIONS")
         .unwrap_or(String::from("Nicht dabei,Mir egal"))
         .split(",")
         .map(|s| s.trim().into())
         .collect::<Vec<String>>();
 
     let options_count = POLL_MAX_OPTIONS_COUNT - default_options.len();
-    let mut options = match api.queue().await {
+    let options = match api.queue().await {
         Ok(value) => value
             .movies
             .into_iter()
@@ -180,12 +201,7 @@ async fn send_movie_poll(api: Api, bot: &Bot, chat_id: i64) -> anyhow::Result<Me
         Err(anyhow!(msg))?
     }
 
-    Ok(bot
-        .send_poll(chat_id, question, options)
-        .is_anonymous(false)
-        .allows_multiple_answers(true)
-        .send()
-        .await?)
+    send_poll(question, options, true, false, bot, chat_id).await
 }
 
 async fn answer(
@@ -219,6 +235,7 @@ async fn answer(
 
     Ok(())
 }
+
 async fn inline_query_handler(
     query: InlineQuery,
     bot: AutoSend<Bot>,
@@ -236,6 +253,12 @@ async fn main() -> anyhow::Result<()> {
     if env::args().any(|arg| arg.to_lowercase() == String::from("poll")) {
         let api = Api::new(env::var("BASE_URL").unwrap_or("http://api".to_string()).parse().expect("BASE_URL is in the wrong format"));
         println!("{:#?}", send_movie_poll(api, bot.inner(), env::var("ADMIN_CHAT").expect("`ADMIN_CHAT` has to be set").parse::<i64>()?).await?);
+
+        return Ok(());
+    }
+
+    if env::args().any(|arg| arg.to_lowercase() == String::from("participation-poll")) {
+        println!("{:#?}", send_participation_poll(bot.inner(), env::var("ADMIN_CHAT").expect("`ADMIN_CHAT` has to be set").parse::<i64>()?).await?);
 
         return Ok(());
     }
