@@ -18,7 +18,7 @@ name = "timhatdiehandandermaus"
 
 [dependencies]
 anyhow = "1.0.56"
-teloxide = { version = "0.7.1", features = ["macros", "auto-send", "native-tls", "ctrlc_handler", "dispatching2", "cache-me"], default-features = false }
+teloxide = { version = "0.7.2", features = ["macros", "auto-send", "native-tls", "ctrlc_handler", "dispatching2", "cache-me"], default-features = false }
 tokio = { version = "1.17.0", features = ["rt-multi-thread", "macros"] }
 log = { version = "0.4.16", default-features = false }
 pretty_env_logger = { version = "0.4.0", default-features = false }
