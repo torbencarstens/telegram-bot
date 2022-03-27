@@ -41,7 +41,7 @@ cronjob:
     imagePullPolicy: Always
     command: [ '"/app/timhatdiehandandermaus"' ]
     args: [ '"participation-poll"' ]
-    schedule: "CRON_TZ=UTC 0 19 * * 0"
+    schedule: "CRON_TZ=UTC 0 16 * * 0"
     backoffLimit: 0
     successfulJobsHistoryLimit: 1
     failedJobsHistoryLimit: 1
