@@ -246,7 +246,7 @@ async fn send_participation_poll(bot: &Bot, chat_id: i64) -> anyhow::Result<Mess
 async fn send_movie_poll(api: Api, bot: &Bot, chat_id: i64) -> anyhow::Result<Message> {
     let question = "Which movie do you want to watch?";
 
-    let mut default_options = env::var("POLL_DEFAULT_OPTIONS")
+    let default_options = env::var("POLL_DEFAULT_OPTIONS")
         .unwrap_or(String::from("Mir egal"))
         .split(",")
         .map(|s| s.trim().into())
