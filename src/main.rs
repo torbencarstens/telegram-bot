@@ -4,7 +4,7 @@ use std::str::FromStr;
 
 use anyhow::anyhow;
 use teloxide::{prelude2::*, utils::command::BotCommand};
-use teloxide_core::types::{InlineQuery, InlineQueryResultArticle, InputMessageContent, InputMessageContentText};
+use teloxide_core::types::{InlineQuery};
 use tokio;
 use url::Url;
 
@@ -12,6 +12,7 @@ use timhatdiehandandermaus::api::Api;
 use timhatdiehandandermaus::MovieDeleteStatus;
 
 static POLL_MAX_OPTIONS_COUNT: usize = 10;
+static TELEGRAM_MESSAGE_LENGTH_LIMIT: usize = 4096;
 
 #[derive(Clone, Debug)]
 struct CommandTypeMovieRating {
@@ -117,18 +118,92 @@ impl Command {
             .map_err(|e| anyhow!("[ delete_movie[3]: couldn't answer: {:?} ]", e))
     }
 
-    pub async fn queue(bot: AutoSend<Bot>, message: Message, api: Api) -> anyhow::Result<Message> {
-        let msg = match Command::wade_through("queue", Ok(api
-            .queue()
-            .await)) {
-            Ok(value) => value,
-            Err(error) => format!("[ queue[2]: {:?} ]", error)
-        };
+    fn get_possible_split_indices<'a>(message: &'a String, split_pattern: &'a str) -> impl Iterator<Item=usize> + 'a {
+        message
+            .match_indices(split_pattern)
+            .map::<usize, _>(|mi| mi.0 + 3)
+    }
 
-        bot
-            .send_message(message.chat.id, msg)
+    fn find_closest_index_split_in_string<'a, I: Clone + Iterator<Item=usize>>(indices: &mut I, value: usize) -> Option<usize> {
+        let mut _indices = indices.clone();
+        let index = _indices
+            .position(|index| index > value)?;
+
+        if index == 0 {
+            None
+        } else {
+            indices.nth(index)
+        }
+    }
+
+    // requirement: split-length is < value
+    fn split_message(mut message: String, split_pattern: &str) -> Option<Vec<String>> {
+        let mut messages = vec![];
+        let mut eof = false;
+        let indices: Vec<usize> = Command::get_possible_split_indices(&message, split_pattern).collect();
+
+        let mut indices = indices.into_iter();
+        let mut modifier = 1;
+        while !eof {
+            let index = match Command::find_closest_index_split_in_string(&mut indices, TELEGRAM_MESSAGE_LENGTH_LIMIT * modifier) {
+                None => if messages.len() == 0 { Some(message.len()) } else { None },
+                Some(index) => Some(index),
+            };
+
+            if index.is_none() || index.unwrap() == message.len() {
+                eof = true;
+            }
+
+            if index.is_none() {
+                messages.push(message.clone());
+                continue;
+            } else {
+                println!("index: <{}>", index.unwrap());
+            }
+
+            let msg = message.split_at(index.unwrap() - (TELEGRAM_MESSAGE_LENGTH_LIMIT * (modifier - 1)));
+            messages.push(msg.0.to_string());
+
+            modifier += 1;
+            message = msg.1.to_string();
+        }
+
+        Some(messages)
+    }
+
+    async fn send_messages(bot: AutoSend<Bot>, chat_id: i64, messages: Vec<String>) -> Vec<anyhow::Result<Message>> {
+        let mut results: Vec<anyhow::Result<Message>> = Vec::new();
+        for msg in messages {
+            let result: anyhow::Result<Message> = bot
+                .send_message(chat_id, msg)
+                .await
+                .map_err(|e| anyhow!("[ send_messages[0]: couldn't answer: {:?} ]", e));
+            results.push(result);
+        }
+
+        results
+    }
+
+    pub async fn queue(bot: AutoSend<Bot>, message: Message, api: Api) -> anyhow::Result<Vec<Message>> {
+        let chat_id = message.chat.id;
+        let message = api
+            .queue()
+            .await?
+            .movies
+            .into_iter()
+            .map(|movie| match movie {
+                Ok(movie) => format!("{}\n", movie),
+                Err(_) => String::from("failed to retrieve movie: 0⭐\n")
+            })
+            .collect::<Vec<String>>()
+            .join("");
+        let messages = Command::split_message(message, "⭐")
+            .ok_or(anyhow!("couldn't split message"))?;
+
+        Command::send_messages(bot, chat_id, messages)
             .await
-            .map_err(|e| anyhow!("[ queue[3]: couldn't answer: {:?} ]", e))
+            .into_iter()
+            .collect()
     }
 
     pub async fn get(bot: AutoSend<Bot>, message: Message, api: Api, title: String) -> anyhow::Result<Message> {
@@ -225,7 +300,7 @@ async fn answer(
         Command::WerHatDieHandAnDerMaus => bot.send_message(message.chat.id, format!("Tim")).await?,
         Command::Add(imdb_url) => Command::add_movie(bot, message, api, imdb_url).await?,
         Command::Delete(title) => Command::delete_movie(bot, message, api, title, MovieDeleteStatus::Deleted).await?,
-        Command::Queue => Command::queue(bot, message, api).await?,
+        Command::Queue => Command::queue(bot, message, api).await?.remove(0), // TODO
         Command::Watch(title) => Command::delete_movie(bot, message, api, title, MovieDeleteStatus::Watched).await?,
         Command::Get(title) => Command::get(bot, message, api, title).await?,
         Command::Poll => send_movie_poll(api.clone(), bot.inner(), message.chat.id).await?,
