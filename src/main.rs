@@ -157,8 +157,6 @@ impl Command {
             if index.is_none() {
                 messages.push(message.clone());
                 continue;
-            } else {
-                println!("index: <{}>", index.unwrap());
             }
 
             let msg = message.split_at(index.unwrap() - (TELEGRAM_MESSAGE_LENGTH_LIMIT * (modifier - 1)));
@@ -320,7 +318,6 @@ async fn inline_query_handler(
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    teloxide::enable_logging!();
     let bot_name = env::var("BOT_NAME")?;
     log::info!("Starting {}...", bot_name);
     let bot = Bot::from_env().auto_send();
