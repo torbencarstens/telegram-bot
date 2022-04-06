@@ -16,24 +16,44 @@ deployment:
     memory: 300Mi
 
 cronjob:
-  name: telegram-bot-which-movie-poll
-  image: ghcr.io/tim-hat-die-hand-an-der-maus/telegram-bot:__TAG__
-  imagePullPolicy: Always
-  command: [ '"/app/timhatdiehandandermaus"' ]
-  args: [ '"poll"' ]
-  schedule: "CRON_TZ=UTC 0 19 * * 5"
-  backoffLimit: 0
-  successfulJobsHistoryLimit: 1
-  failedJobsHistoryLimit: 1
-  restartPolicy: Never
-  labels:
-    app: telegram-bot-poll
-  requests:
-    cpu: 100m
-    memory: 100Mi
-  limit:
-    cpu: 300m
-    memory: 300Mi
+  movie:
+    name: telegram-bot-which-movie-poll
+    image: ghcr.io/tim-hat-die-hand-an-der-maus/telegram-bot:__TAG__
+    imagePullPolicy: Always
+    command: [ '"/app/timhatdiehandandermaus"' ]
+    args: [ '"poll"' ]
+    schedule: "CRON_TZ=UTC 0 19 * * 5"
+    backoffLimit: 0
+    successfulJobsHistoryLimit: 1
+    failedJobsHistoryLimit: 1
+    restartPolicy: Never
+    labels:
+      app: telegram-bot-poll
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limit:
+      cpu: 300m
+      memory: 300Mi
+  participation:
+    name: telegram-bot-participation-poll
+    image: ghcr.io/tim-hat-die-hand-an-der-maus/telegram-bot:__TAG__
+    imagePullPolicy: Always
+    command: [ '"/app/timhatdiehandandermaus"' ]
+    args: [ '"participation-poll"' ]
+    schedule: "CRON_TZ=UTC 0 16 * * 0"
+    backoffLimit: 0
+    successfulJobsHistoryLimit: 1
+    failedJobsHistoryLimit: 1
+    restartPolicy: Never
+    labels:
+      app: telegram-bot-poll
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limit:
+      cpu: 300m
+      memory: 300Mi
 
 poll:
   defaultOptions: "Mir egal"
