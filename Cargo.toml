@@ -28,7 +28,7 @@ url = { version = "2.2.2", default-features = false }
 serde = { version = "1.0.136", features = ["std"], default-features = false }
 serde_derive = { version = "1.0.136", default-features = false }
 serde_json = { version = "1.0.79", features = ["raw_value"], default-features = false }
-teloxide-core = { version = "0.5.0", features = ["native-tls"], default-features = false } # rustls
+teloxide-core = { version = "0.5.1", features = ["native-tls"], default-features = false } # rustls
 futures = { version = "0.3.21", features = ["std", "async-await", "executor"], default-features = false }
 futures-util = { version = "0.3.21", features = ["std", "async-await", "async-await-macro"], default-features = false }
 async-std = "1.11.0"
