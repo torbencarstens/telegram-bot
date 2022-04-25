@@ -3,7 +3,7 @@ use std::fmt::{self, Debug};
 use std::str::FromStr;
 
 use anyhow::anyhow;
-use teloxide::{prelude2::*, utils::command::BotCommand};
+use teloxide::{prelude::*, utils::command::BotCommand};
 use teloxide_core::types::{InlineQuery};
 use tokio;
 use url::Url;
