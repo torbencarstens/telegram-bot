@@ -4,6 +4,7 @@ use std::str::FromStr;
 
 use anyhow::anyhow;
 use teloxide::{prelude::*, utils::command::BotCommand};
+use teloxide::types::ChatId;
 use teloxide_core::types::{InlineQuery};
 use tokio;
 use url::Url;
@@ -169,7 +170,7 @@ impl Command {
         Some(messages)
     }
 
-    async fn send_messages(bot: AutoSend<Bot>, chat_id: i64, messages: Vec<String>) -> Vec<anyhow::Result<Message>> {
+    async fn send_messages(bot: AutoSend<Bot>, chat_id: ChatId, messages: Vec<String>) -> Vec<anyhow::Result<Message>> {
         let mut results: Vec<anyhow::Result<Message>> = Vec::new();
         for msg in messages {
             let result: anyhow::Result<Message> = bot
@@ -222,7 +223,7 @@ impl Command {
     }
 }
 
-async fn send_poll<S: Into<String>, V: IntoIterator<Item=String>>(question: S, options: V, allow_multiple_answers: bool, is_anonymous: bool, bot: &Bot, chat_id: i64) -> anyhow::Result<Message> {
+async fn send_poll<S: Into<String>, V: IntoIterator<Item=String>>(question: S, options: V, allow_multiple_answers: bool, is_anonymous: bool, bot: &Bot, chat_id: ChatId) -> anyhow::Result<Message> {
     Ok(bot
         .send_poll(chat_id, question, options)
         .is_anonymous(is_anonymous)
@@ -231,7 +232,7 @@ async fn send_poll<S: Into<String>, V: IntoIterator<Item=String>>(question: S, o
         .await?)
 }
 
-async fn send_participation_poll(bot: &Bot, chat_id: i64) -> anyhow::Result<Message> {
+async fn send_participation_poll(bot: &Bot, chat_id: ChatId) -> anyhow::Result<Message> {
     let question = "Ich bin";
 
     let options = env::var("PARTICIPATION_POLL_DEFAULT_OPTIONS")
@@ -243,7 +244,7 @@ async fn send_participation_poll(bot: &Bot, chat_id: i64) -> anyhow::Result<Mess
     send_poll(question, options, false, false, bot, chat_id).await
 }
 
-async fn send_movie_poll(api: Api, bot: &Bot, chat_id: i64) -> anyhow::Result<Message> {
+async fn send_movie_poll(api: Api, bot: &Bot, chat_id: ChatId) -> anyhow::Result<Message> {
     let question = "Which movie do you want to watch?";
 
     let default_options = env::var("POLL_DEFAULT_OPTIONS")
@@ -286,9 +287,9 @@ async fn answer(
     log::info!("{:?}", command);
 
     // TODO: This should be assembled from members of the group at some point (talk to API for that)
-    if message.chat.id != env::var("ADMIN_CHAT")?.parse::<i64>()? {
+    if message.chat.id != ChatId(env::var("ADMIN_CHAT")?.parse::<i64>()?) {
         bot.send_message(message.chat.id, "You're not allowed to use this bot.").await?;
-        log::info!("{} ([u]{:?} | [f]{:?} | [l]{:?} | [t]{:?}) is not allowed to use this bot", message.chat.id, message.chat.username(), message.chat.first_name(), message.chat.last_name(), message.chat.title());
+        log::info!("{} ([u]{:?} | [f]{:?} | [l]{:?} | [t]{:?}) is not allowed to use this bot", message.chat.id.0, message.chat.username(), message.chat.first_name(), message.chat.last_name(), message.chat.title());
 
         return Ok(());
     }
@@ -321,16 +322,17 @@ async fn main() -> anyhow::Result<()> {
     let bot_name = env::var("BOT_NAME")?;
     log::info!("Starting {}...", bot_name);
     let bot = Bot::from_env().auto_send();
+    let admin_chat_id = ChatId(env::var("ADMIN_CHAT").expect("`ADMIN_CHAT` has to be set").parse::<i64>()?);
 
     if env::args().any(|arg| arg.to_lowercase() == String::from("poll")) {
         let api = Api::new(env::var("BASE_URL").unwrap_or("http://api".to_string()).parse().expect("BASE_URL is in the wrong format"));
-        println!("{:#?}", send_movie_poll(api, bot.inner(), env::var("ADMIN_CHAT").expect("`ADMIN_CHAT` has to be set").parse::<i64>()?).await?);
+        println!("{:#?}", send_movie_poll(api, bot.inner(), admin_chat_id).await?);
 
         return Ok(());
     }
 
     if env::args().any(|arg| arg.to_lowercase() == String::from("participation-poll")) {
-        println!("{:#?}", send_participation_poll(bot.inner(), env::var("ADMIN_CHAT").expect("`ADMIN_CHAT` has to be set").parse::<i64>()?).await?);
+        println!("{:#?}", send_participation_poll(bot.inner(), admin_chat_id).await?);
 
         return Ok(());
     }
