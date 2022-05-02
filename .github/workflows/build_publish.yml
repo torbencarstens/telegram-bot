@@ -36,6 +36,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: [build_push_docker, lint]
+    concurrency: deploy_production
     steps:
       - uses: actions/checkout@v3
       - name: update tag in manifest.yml
