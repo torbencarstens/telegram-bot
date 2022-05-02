@@ -17,6 +17,7 @@ jobs:
 
   build_push_docker:
     runs-on: ubuntu-latest
+    concurrency: deploy_production
     steps:
       - uses: actions/checkout@v3
       - name: Build the tagged Docker image
