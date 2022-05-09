@@ -225,7 +225,7 @@ impl Command {
     }
 
     pub async fn wo_stream(bot: AutoSend<Bot>, message: Message, query: String) -> anyhow::Result<Message> {
-        let url = env::var("STREAMINGPROVIDER_URL").unwrap_or("http://streamingprovider-resolver:8080/search".to_string());
+        let url = env::var("STREAMINGPROVIDER_URL").unwrap_or("http://streamingprovider-resolver:80/search".to_string());
         let url = url.parse().map_err(|e| anyhow!("failed to decode streamingprovider url {}", e))?;
         let msg = ResolverApi::new(url).search(query).await??.results;
         let msg = format!("{}", msg.iter().map(|x| x.to_string()).collect::<Vec<String>>().join("\n\n"));
@@ -304,7 +304,7 @@ async fn answer(
 
     // TODO: This should be assembled from members of the group at some point (talk to API for that)
     if message.chat.id != env::var("ADMIN_CHAT")?.parse::<i64>()? {
-        bot.send_message(message.chat.id, "You're not allowed to use this bot.").await?;
+        bot.send_message(message.chat.id, "You're not allowed to use this bot").await?;
         log::info!("{} ([u]{:?} | [f]{:?} | [l]{:?} | [t]{:?}) is not allowed to use this bot", message.chat.id, message.chat.username(), message.chat.first_name(), message.chat.last_name(), message.chat.title());
 
         return Ok(());
