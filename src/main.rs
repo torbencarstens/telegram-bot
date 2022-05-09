@@ -227,7 +227,15 @@ impl Command {
     pub async fn wo_stream(bot: AutoSend<Bot>, message: Message, query: String) -> anyhow::Result<Message> {
         let url = env::var("STREAMINGPROVIDER_URL").unwrap_or("http://streamingprovider-resolver:80/search".to_string());
         let url = url.parse().map_err(|e| anyhow!("failed to decode streamingprovider url {}", e))?;
-        let msg = ResolverApi::new(url).search(query).await??.results;
+        let msg = ResolverApi::new(url).search(query).await;
+        if msg.is_err() {
+            return bot
+                .send_message(message.chat.id, format!("{:?}", msg))
+                .await
+                .map_err(|e| anyhow!("[ get[3]: couldn't answer: {:?} ]", e));
+        }
+
+        let msg = msg??.results;
         let msg = format!("{}", msg.iter().map(|x| x.to_string()).collect::<Vec<String>>().join("\n\n"));
 
         bot
@@ -235,8 +243,6 @@ impl Command {
             .await
             .map_err(|e| anyhow!("[ get[3]: couldn't answer: {:?} ]", e))
     }
-
-
 }
 
 async fn send_poll<S: Into<String>, V: IntoIterator<Item=String>>(question: S, options: V, allow_multiple_answers: bool, is_anonymous: bool, bot: &Bot, chat_id: i64) -> anyhow::Result<Message> {
