@@ -6,6 +6,7 @@ use anyhow::anyhow;
 use serde::{Deserialize, Serialize};
 
 pub mod api;
+pub mod resolver;
 
 const QUEUED_STR: &str = "Queued";
 const WATCHED_STR: &str = "Watched";

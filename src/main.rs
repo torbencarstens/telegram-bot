@@ -10,6 +10,7 @@ use url::Url;
 
 use timhatdiehandandermaus::api::Api;
 use timhatdiehandandermaus::MovieDeleteStatus;
+use timhatdiehandandermaus::resolver::ResolverApi;
 
 static POLL_MAX_OPTIONS_COUNT: usize = 10;
 static TELEGRAM_MESSAGE_LENGTH_LIMIT: usize = 4096;
@@ -65,6 +66,8 @@ enum Command {
     Poll,
     #[command(description = "noop")]
     Noop,
+    #[command(description = "wo stream diggah")]
+    WoStream(String)
 }
 
 impl Command {
@@ -220,6 +223,20 @@ impl Command {
             .await
             .map_err(|e| anyhow!("[ get[3]: couldn't answer: {:?} ]", e))
     }
+
+    pub async fn wo_stream(bot: AutoSend<Bot>, message: Message, query: String) -> anyhow::Result<Message> {
+        let url = env::var("STREAMINGPROVIDER_URL").unwrap_or("http://streamingprovider-resolver:8080/search".to_string());
+        let url = url.parse().map_err(|e| anyhow!("failed to decode streamingprovider url {}", e))?;
+        let msg = ResolverApi::new(url).search(query).await??.results;
+        let msg = format!("{}", msg.iter().map(|x| x.to_string()).collect::<Vec<String>>().join("\n\n"));
+
+        bot
+            .send_message(message.chat.id, msg)
+            .await
+            .map_err(|e| anyhow!("[ get[3]: couldn't answer: {:?} ]", e))
+    }
+
+
 }
 
 async fn send_poll<S: Into<String>, V: IntoIterator<Item=String>>(question: S, options: V, allow_multiple_answers: bool, is_anonymous: bool, bot: &Bot, chat_id: i64) -> anyhow::Result<Message> {
@@ -293,7 +310,7 @@ async fn answer(
         return Ok(());
     }
 
-    match command {
+    Ok(match command {
         Command::Help => bot.send_message(message.chat.id, Command::descriptions()).await?,
         Command::WerHatDieHandAnDerMaus => bot.send_message(message.chat.id, format!("Tim")).await?,
         Command::Add(imdb_url) => Command::add_movie(bot, message, api, imdb_url).await?,
@@ -303,10 +320,9 @@ async fn answer(
         Command::Get(title) => Command::get(bot, message, api, title).await?,
         Command::Poll => send_movie_poll(api.clone(), bot.inner(), message.chat.id).await?,
         Command::Noop => bot.send_message(message.chat.id, "").await?,
+        Command::WoStream(query) => Command::wo_stream(bot, message, query).await?,
         command_name => bot.send_message(message.chat.id, format!("{:#?} is not implemented yet.", command_name)).await?,
-    };
-
-    Ok(())
+    }).and_then(|_| Ok(()))
 }
 
 async fn inline_query_handler(
