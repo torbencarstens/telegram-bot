@@ -1553,9 +1553,9 @@ dependencies = [
 
 [[package]]
 name = "teloxide-core"
-version = "0.6.0"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fad48e747287e6b77aafc5f1a3d31936738cca72e742c86bbdae85bfff39104b"
+checksum = "77b44add31e2c286e53dd68b41414059c4d087402442bae3465fe9c85433b410"
 dependencies = [
  "bitflags",
  "bytes",
@@ -1652,7 +1652,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "teloxide",
- "teloxide-core 0.6.0",
+ "teloxide-core 0.6.1",
  "thiserror",
  "tokio",
  "tokio-stream",
