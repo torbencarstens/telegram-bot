@@ -31,5 +31,5 @@ serde_json = { version = "1.0.81", features = ["raw_value"], default-features = 
 teloxide-core = { version = "0.6.1", features = ["native-tls"], default-features = false } # rustls
 futures = { version = "0.3.21", features = ["std", "async-await", "executor"], default-features = false }
 futures-util = { version = "0.3.21", features = ["std", "async-await", "async-await-macro"], default-features = false }
-async-std = "1.11.0"
+async-std = "1.12.0"
 tokio-stream = { version = "0.1.8", features = ["time"], default-features = false }
