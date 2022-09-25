@@ -32,4 +32,4 @@ teloxide-core = { version = "0.6.1", features = ["native-tls"], default-features
 futures = { version = "0.3.21", features = ["std", "async-await", "executor"], default-features = false }
 futures-util = { version = "0.3.21", features = ["std", "async-await", "async-await-macro"], default-features = false }
 async-std = "1.11.0"
-tokio-stream = { version = "0.1.8", features = ["time"], default-features = false }
+tokio-stream = { version = "0.1.10", features = ["time"], default-features = false }
