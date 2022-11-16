@@ -87,11 +87,13 @@ impl Api {
 
     // has to be the exact title for now
     pub async fn get_movie_by_title(&self, title: &String) -> anyhow::Result<Option<Movie>> {
+        let lowercase_title = title.to_lowercase();
+
         Ok(self.queue().await?
             .movies
             .into_iter()
             .filter_map(|movie| movie.ok())
-            .filter(|movie| &movie.imdb.title == title)
+            .filter(|movie| movie.imdb.title.to_lowercase() == lowercase_title)
             .next())
     }
 
