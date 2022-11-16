@@ -74,11 +74,7 @@ impl Api {
     pub async fn delete_movie(&self, id: String, status: MovieDeleteStatus) -> anyhow::Result<anyhow::Result<Movie>> {
         self.delete(ApiEndpoints::DeleteMovie(&id, status).to_string())
             .await
-            .map(|body| {
-                println!("{:?}", body.status());
-
-                Api::decode_body(body)
-            })
+            .map(|body| Api::decode_body(body))
             .map_err(|e| anyhow!("[ Api::delete_movie[0]: failed to delete movie from endpoint: {:?} ]", e))
     }
 
@@ -127,10 +123,7 @@ impl Api {
     }
 
     async fn get(&self, path: String) -> anyhow::Result<Response> {
-        println!("Api::get:{}{}", self.base_url, path);
-
         let url = self.join_on_base_url(&path)?;
-        println!("Api::get:url:{}", url);
 
         let res = self
             .client
