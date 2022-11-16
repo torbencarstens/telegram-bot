@@ -4,7 +4,7 @@ use std::str::FromStr;
 
 use anyhow::anyhow;
 use teloxide::{prelude2::*, utils::command::BotCommand};
-use teloxide_core::types::{InlineQuery};
+use teloxide_core::types::InlineQuery;
 use tokio;
 use url::Url;
 
@@ -67,7 +67,7 @@ enum Command {
     #[command(description = "noop")]
     Noop,
     #[command(description = "wo stream diggah")]
-    WoStream(String)
+    WoStream(String),
 }
 
 impl Command {

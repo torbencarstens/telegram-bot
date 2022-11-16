@@ -1,9 +1,10 @@
 use std::fmt::{Debug, Formatter};
+
 use anyhow::anyhow;
 use reqwest::{Client, StatusCode};
 use reqwest::Response;
-use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
+use serde::de::DeserializeOwned;
 use teloxide_core::net;
 use thiserror::Error;
 use url::Url;

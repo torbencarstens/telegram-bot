@@ -77,7 +77,7 @@ pub struct Movie {
 
 #[derive(Debug)]
 pub struct Movies {
-    pub movies: Vec<anyhow::Result<Movie>>
+    pub movies: Vec<anyhow::Result<Movie>>,
 }
 
 impl fmt::Display for Movies {

@@ -34,7 +34,7 @@ impl<'a> ToString for ApiEndpoints<'a> {
             ApiEndpoints::AddMovie => "movie".to_string(),
             ApiEndpoints::DeleteMovie(id, status) => {
                 format!("queue/{}?status={}", id, status.to_string())
-            },
+            }
             ApiEndpoints::GetMovie(id) => {
                 format!("movie/{}", id)
             }
@@ -114,6 +114,7 @@ impl Api {
         Ok(Movies { movies: movies.into_iter().collect::<anyhow::Result<Vec<anyhow::Result<Movie>>>>()? })
     }
 
+    //noinspection DuplicatedCode
     fn decode_body<'a, R: DeserializeOwned>(response: Response) -> anyhow::Result<R> {
         log::info!("decode_body");
         let text = async_std::task::block_on(response.text())?;
