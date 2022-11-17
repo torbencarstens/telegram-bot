@@ -22,7 +22,7 @@ teloxide = { version = "0.7.3", features = ["macros", "auto-send", "native-tls",
 tokio = { version = "1.21.2", features = ["rt-multi-thread", "macros"] }
 log = { version = "0.4.17", default-features = false }
 pretty_env_logger = { version = "0.4.0", default-features = false }
-thiserror = { version = "1.0.31", default-features = false }
+thiserror = { version = "1.0.37", default-features = false }
 reqwest = { version = "0.11.11", features = ["blocking", "default-tls"], default-features = false }
 url = { version = "2.2.2", default-features = false }
 serde = { version = "1.0.139", features = ["std"], default-features = false }
