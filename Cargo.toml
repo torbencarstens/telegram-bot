@@ -19,7 +19,7 @@ name = "timhatdiehandandermaus"
 [dependencies]
 anyhow = "1.0.58"
 teloxide = { version = "0.7.3", features = ["macros", "auto-send", "native-tls", "ctrlc_handler", "dispatching2", "cache-me"], default-features = false }
-tokio = { version = "1.17.0", features = ["rt-multi-thread", "macros"] }
+tokio = { version = "1.21.2", features = ["rt-multi-thread", "macros"] }
 log = { version = "0.4.17", default-features = false }
 pretty_env_logger = { version = "0.4.0", default-features = false }
 thiserror = { version = "1.0.31", default-features = false }
@@ -32,4 +32,4 @@ teloxide-core = { version = "0.6.1", features = ["native-tls"], default-features
 futures = { version = "0.3.21", features = ["std", "async-await", "executor"], default-features = false }
 futures-util = { version = "0.3.21", features = ["std", "async-await", "async-await-macro"], default-features = false }
 async-std = "1.11.0"
-tokio-stream = { version = "0.1.8", features = ["time"], default-features = false }
+tokio-stream = { version = "0.1.11", features = ["time"], default-features = false }
