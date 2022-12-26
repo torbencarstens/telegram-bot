@@ -25,7 +25,7 @@ pretty_env_logger = { version = "0.4.0", default-features = false }
 thiserror = { version = "1.0.37", default-features = false }
 reqwest = { version = "0.11.13", features = ["blocking", "default-tls"], default-features = false }
 url = { version = "2.3.1", default-features = false }
-serde = { version = "1.0.147", features = ["std"], default-features = false }
+serde = { version = "1.0.152", features = ["std"], default-features = false }
 serde_derive = { version = "1.0.147", default-features = false }
 serde_json = { version = "1.0.87", features = ["raw_value"], default-features = false }
 teloxide-core = { version = "0.7.1", features = ["native-tls"], default-features = false } # rustls
