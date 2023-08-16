@@ -1,4 +1,4 @@
-FROM debian:stretch-slim AS builder
+FROM debian:stable-slim AS builder
 
 RUN apt update && apt install -y musl-tools musl-dev openssl libssl-dev pkg-config curl
 
