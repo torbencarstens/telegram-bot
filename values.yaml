@@ -66,5 +66,4 @@ configmap:
 
 secret:
   name: telegram-token
-  telegramToken: __TELEGRAM_TOKEN__
   apiToken: __API_TOKEN__

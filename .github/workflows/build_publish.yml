@@ -13,9 +13,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: update tag in manifest.yml
         run: sed -i -e "s#__TAG__#${GITHUB_SHA}#g" values.yaml
-      - name: update telegram token in manifest.yml
-        run: sed -i -e "s#__TELEGRAM_TOKEN__#${{ secrets.TELEGRAM_TOKEN }}#g" values.yaml
-      - name: update telegram token in manifest.yml
+      - name: update api token in manifest.yml
         run: sed -i -e "s#__API_TOKEN__#${{ secrets.API_TOKEN }}#g" values.yaml
       - name: install helm chart
         uses: WyriHaximus/github-action-helm3@v3
