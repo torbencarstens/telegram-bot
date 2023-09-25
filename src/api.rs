@@ -91,6 +91,7 @@ impl Api {
 
         Ok(self.queue().await?
             .movies
+            .movies
             .into_iter()
             .filter_map(|movie| movie.ok())
             .filter(|movie| movie.imdb.title.to_lowercase() == lowercase_title)
