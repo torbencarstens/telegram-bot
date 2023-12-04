@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "telegram-bot"
+version = "0.1.0"
+description = ""
+authors = ["Blindfolded Surgery <team@blindfolded.surgery>"]
+license = "MIT"
+readme = "README.md"
+
+[[tool.poetry.source]]
+name = "internal"
+url = "https://pypi.blindfolded.surgery"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+httpx = "^0.25.2"
+python-telegram-bot = "^20.4"
+thefuzz = "^0.20.0"
+python-levenshtein = "^0.21.1"
+timhatdiehandandermaus_sdk = "^0.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100

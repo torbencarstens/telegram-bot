@@ -3,8 +3,10 @@ namespace: timhatdiehandandermaus
 deployment:
   name: telegram-bot
   image: ghcr.io/tim-hat-die-hand-an-der-maus/telegram-bot:__TAG__
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   revisionHistoryLimit: 1
+  command: [ "python" ]
+  args: [ "-OOO", "-B", "src/telegram-bot/main.py", "poll" ]
   replicas: 1
   labels:
     app: telegram-bot
@@ -20,9 +22,10 @@ cronjob:
     name: telegram-bot-which-movie-poll
     image: ghcr.io/tim-hat-die-hand-an-der-maus/telegram-bot:__TAG__
     imagePullPolicy: Always
-    command: [ '"/app/timhatdiehandandermaus"' ]
-    args: [ '"poll"' ]
-    schedule: "CRON_TZ=UTC 0 19 * * 5"
+    command: [ "python" ]
+    args: [ "-OOO", "-B", "src/telegram-bot/main.py", "poll" ]
+    schedule: "0 19 * * 5"
+    timeZone: "Europe/Berlin"
     backoffLimit: 0
     successfulJobsHistoryLimit: 1
     failedJobsHistoryLimit: 1
@@ -39,9 +42,10 @@ cronjob:
     name: telegram-bot-participation-poll
     image: ghcr.io/tim-hat-die-hand-an-der-maus/telegram-bot:__TAG__
     imagePullPolicy: Always
-    command: [ '"/app/timhatdiehandandermaus"' ]
-    args: [ '"participation-poll"' ]
-    schedule: "CRON_TZ=UTC 0 16 * * 0"
+    command: [ "python" ]
+    args: [ "-OOO", "-B", "src/telegram-bot/main.py", "participation-poll" ]
+    schedule: "0 16 * * 0"
+    timeZone: "Europe/Berlin"
     backoffLimit: 0
     successfulJobsHistoryLimit: 1
     failedJobsHistoryLimit: 1
@@ -60,10 +64,11 @@ poll:
 
 configmap:
   name: telegram-bot-config
-  botName: "watchqueuebot"
   baseUrl: "http://api:8080"
-  adminChat: "-1001556735505"
+  chatId: "-1001556735505"
+  woStreamBaseUrl: "http://streamingprovider-resolver"
 
 secret:
   name: telegram-token
+  telegramToken: __TELEGRAM_TOKEN__
   apiToken: __API_TOKEN__
