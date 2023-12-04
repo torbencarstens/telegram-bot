@@ -24,6 +24,11 @@ spec:
           imagePullPolicy: {{ .Values.deployment.imagePullPolicy }}
           command: {{ .Values.cronjob.participation.command }}
           args: {{ .Values.cronjob.participation.args | toYaml | nindent 12 }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.secret.name }}
+            - configMapRef:
+                name: {{ .Values.configmap.name }}
           resources:
             requests:
               cpu: {{ .Values.deployment.requests.cpu }}

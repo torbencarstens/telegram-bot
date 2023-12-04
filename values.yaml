@@ -5,8 +5,8 @@ deployment:
   image: ghcr.io/tim-hat-die-hand-an-der-maus/telegram-bot:__TAG__
   imagePullPolicy: IfNotPresent
   revisionHistoryLimit: 1
-  command: [ "python" ]
-  args: [ "-OOO", "-B", "src/telegram-bot/main.py", "poll" ]
+  command: [ "poetry" ]
+  args: [ "run", "python", "-OOO", "-B", "src/telegram-bot/main.py" ]
   replicas: 1
   labels:
     app: telegram-bot
@@ -22,8 +22,8 @@ cronjob:
     name: telegram-bot-which-movie-poll
     image: ghcr.io/tim-hat-die-hand-an-der-maus/telegram-bot:__TAG__
     imagePullPolicy: Always
-    command: [ "python" ]
-    args: [ "-OOO", "-B", "src/telegram-bot/main.py", "poll" ]
+    command: [ "poetry" ]
+    args: [ "run", "python", "-OOO", "-B", "src/telegram-bot/main.py", "poll" ]
     schedule: "0 19 * * 5"
     timeZone: "Europe/Berlin"
     backoffLimit: 0
@@ -42,8 +42,8 @@ cronjob:
     name: telegram-bot-participation-poll
     image: ghcr.io/tim-hat-die-hand-an-der-maus/telegram-bot:__TAG__
     imagePullPolicy: Always
-    command: [ "python" ]
-    args: [ "-OOO", "-B", "src/telegram-bot/main.py", "participation-poll" ]
+    command: [ "poetry" ]
+    args: [ "run", "python", "-OOO", "-B", "src/telegram-bot/main.py", "participation-poll" ]
     schedule: "0 16 * * 0"
     timeZone: "Europe/Berlin"
     backoffLimit: 0
