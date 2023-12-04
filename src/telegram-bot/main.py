@@ -1,3 +1,4 @@
+import asyncio
 import inspect
 import sys
 
@@ -40,11 +41,14 @@ if __name__ == "__main__":
     _application = ApplicationBuilder().token(bot_token).build()
 
     args = sys.argv[1:]
+    create_logger("__main__").info(f"args: {args}")
     if not args:
         main(_application)
     else:
         chat_id = get_env_or_die("POLL_CHAT_ID", exit_code=2)
         if args[0] == "poll":
-            poll.send_movie_poll(chat_id=chat_id, bot=_application.bot)
+            asyncio.ensure_future(poll.send_movie_poll(chat_id=chat_id, bot=_application.bot))
         elif args[0] == "participation-poll":
-            poll.send_participation_poll(chat_id=chat_id, bot=_application.bot)
+            asyncio.ensure_future(
+                poll.send_participation_poll(chat_id=chat_id, bot=_application.bot)
+            )

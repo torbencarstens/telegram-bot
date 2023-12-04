@@ -22,8 +22,8 @@ spec:
         - name: {{ .Values.deployment.name }}
           image: {{ .Values.deployment.image }}
           imagePullPolicy: {{ .Values.deployment.imagePullPolicy }}
-          command: {{ .Values.cronjob.participation.command }}
-          args: {{ .Values.cronjob.participation.args | toYaml | nindent 12 }}
+          command: {{ .Values.deployment.command }}
+          args: {{ .Values.deployment.args | toYaml | nindent 12 }}
           envFrom:
             - secretRef:
                 name: {{ .Values.secret.name }}
