@@ -15,7 +15,7 @@ python = "^3.11"
 httpx = "^0.25.2"
 python-telegram-bot = "^20.4"
 thefuzz = "^0.20.0"
-python-levenshtein = "^0.21.1"
+python-levenshtein = "^0.23.0"
 timhatdiehandandermaus_sdk = "^0.1.1"
 
 [build-system]
