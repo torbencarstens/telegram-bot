@@ -1,6 +1,4 @@
-import asyncio
 import inspect
-import os
 import sys
 
 import telegram.ext
@@ -14,7 +12,7 @@ from utils import get_env_or_die
 
 def main(application: Application):
     logger = create_logger(inspect.currentframe().f_code.co_name)
-    tbot: telegram.Bot = application.bot
+    # tbot: telegram.Bot = application.bot
 
     # configure bot
     # asyncio.ensure_future(tbot.set_my_commands(config.COMMANDS))
@@ -44,9 +42,9 @@ if __name__ == "__main__":
     args = sys.argv[1:]
     if not args:
         main(_application)
-
-    chat_id = get_env_or_die("POLL_CHAT_ID", exit_code=2)
-    if args[0] == "poll":
-        poll.send_movie_poll(chat_id=chat_id, bot=_application.bot)
-    elif args[0] == "participation-poll":
-        poll.send_participation_poll(chat_id=chat_id, bot=_application.bot)
+    else:
+        chat_id = get_env_or_die("POLL_CHAT_ID", exit_code=2)
+        if args[0] == "poll":
+            poll.send_movie_poll(chat_id=chat_id, bot=_application.bot)
+        elif args[0] == "participation-poll":
+            poll.send_participation_poll(chat_id=chat_id, bot=_application.bot)
