@@ -39,7 +39,9 @@ async def add(update: Update, context: ContextTypes.DEFAULT_TYPE):
     imdb_url = validate_context_args(context, "imdb link required as argument")[0]
 
     movie = api.add_movie(imdb_url=imdb_url)
-    return await TextMessage(movie.telegram_markdown_v2()).send(update)
+    return await TextMessage(movie.telegram_markdown_v2()).send(
+        update, disable_web_page_preview=True
+    )
 
 
 async def handle_watch_delete(update: Update, context: ContextTypes.DEFAULT_TYPE, *, watched: bool):
