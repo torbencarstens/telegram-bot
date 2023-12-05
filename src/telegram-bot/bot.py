@@ -9,17 +9,17 @@ from telegram import (
     ReplyKeyboardRemove,
 )
 from telegram.ext import ContextTypes
-
-from exceptions import MissingContextArgs
-from helper import TextMessage
-from logger import create_logger
 from timhatdiehandandermaus_sdk import (
     MissingToken,
     TimApi,
     MovieStatusSearchRequestEnum,
 )
+
+from exceptions import MissingContextArgs
+from helper import TextMessage
+from logger import create_logger
 from utils import escape_markdown, get_env_or_die
-from wostream import search, search_multiple
+from wostream import search_multiple
 
 api = TimApi(get_env_or_die("API_TOKEN"))
 
