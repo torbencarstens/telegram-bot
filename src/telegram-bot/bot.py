@@ -131,6 +131,8 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message = "Cannot complete action, failed to authorize to TimApi"
         elif e.response.status_code == 403:
             message = "Cannot complete action, it is forbidden"
+        elif e.response.status_code == 409:
+            message = "Movie is already enqueued/has been watched"
         else:
             message = f"Unhandled status code error:\n{str(e)}"
     except httpx.HTTPError as e:
