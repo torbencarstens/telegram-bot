@@ -143,4 +143,6 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = e.msg
 
     message = escape_markdown(message)
-    return await TextMessage(message).send(update)
+    return await TextMessage(message).send(
+        update, reply_to_message_id=update.effective_message.message_id
+    )
