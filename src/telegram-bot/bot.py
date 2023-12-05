@@ -90,7 +90,6 @@ async def watch(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def queue(update: Update, _: ContextTypes.DEFAULT_TYPE):
-    print("/queue")
     queue_movies = api.queued_movies()
 
     markdown_movies = [movie.telegram_markdown_v2() for movie in queue_movies]
