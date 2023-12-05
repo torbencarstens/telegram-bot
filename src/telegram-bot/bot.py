@@ -144,5 +144,7 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     message = escape_markdown(message)
     return await TextMessage(message).send(
-        update, reply_to_message_id=update.effective_message.message_id
+        update,
+        reply_to_message_id=update.effective_message.message_id,
+        disable_web_page_preview=True,
     )
