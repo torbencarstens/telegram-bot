@@ -47,8 +47,6 @@ if __name__ == "__main__":
     else:
         chat_id = get_env_or_die("POLL_CHAT_ID", exit_code=2)
         if args[0] == "poll":
-            asyncio.ensure_future(poll.send_movie_poll(chat_id=chat_id, bot=_application.bot))
+            asyncio.run(poll.send_movie_poll(chat_id=chat_id, bot=_application.bot))
         elif args[0] == "participation-poll":
-            asyncio.ensure_future(
-                poll.send_participation_poll(chat_id=chat_id, bot=_application.bot)
-            )
+            asyncio.run(poll.send_participation_poll(chat_id=chat_id, bot=_application.bot))
