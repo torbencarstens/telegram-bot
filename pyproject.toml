@@ -17,7 +17,7 @@ httpx = "^0.25.2"
 python-telegram-bot = "20.7"
 thefuzz = "^0.20.0"
 python-levenshtein = "^0.23.0"
-timhatdiehandandermaus-sdk = { version = "^2.0.1", source = "internal" }
+timhatdiehandandermaus-sdk = { version = "2.0.1", source = "internal" }
 
 [build-system]
 requires = ["poetry-core"]
