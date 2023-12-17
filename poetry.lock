@@ -533,13 +533,13 @@ rapidfuzz = ">=3.0.0,<4.0.0"
 
 [[package]]
 name = "timhatdiehandandermaus-sdk"
-version = "2.0.1"
+version = "2.0.2"
 description = "SDK for the timhatdiehandandermaus API"
 optional = false
 python-versions = ">=3.11,<3.13"
 files = [
-    {file = "timhatdiehandandermaus_sdk-2.0.1-py3-none-any.whl", hash = "sha256:b3780514633393145d63f7f454d918317203bd6f0911fa11eb3069274a1dedac"},
-    {file = "timhatdiehandandermaus_sdk-2.0.1.tar.gz", hash = "sha256:62602322334e4eae3813657d5a2c804d7994818f09a3ebe294963b658fbeb1e9"},
+    {file = "timhatdiehandandermaus_sdk-2.0.2-py3-none-any.whl", hash = "sha256:1ba660e98838e3c3c4ccd78ce341a2932e31d6ff02b2af1f4e50f0b6f799f39e"},
+    {file = "timhatdiehandandermaus_sdk-2.0.2.tar.gz", hash = "sha256:1e8fd3342aeca501ea67e9faaea7eac998b1a31fc240481f1ce338fe7a419302"},
 ]
 
 [package.dependencies]
@@ -566,4 +566,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11"
-content-hash = "811136ca171a11968934eacee59f982c966137f3b65fc124ccbad7c152be2969"
+content-hash = "936285d6cd4b907c0d17232ea4a16f678a6730ab4ba0973f17999e25a76e6ff2"
