@@ -9,14 +9,15 @@ readme = "README.md"
 [[tool.poetry.source]]
 name = "internal"
 url = "https://pypi.blindfolded.surgery"
+priority = "explicit"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "~3.11"
 httpx = "^0.25.2"
-python-telegram-bot = "^20.4"
+python-telegram-bot = "20.7"
 thefuzz = "^0.20.0"
 python-levenshtein = "^0.23.0"
-timhatdiehandandermaus_sdk = "^0.1.1"
+timhatdiehandandermaus_sdk = { version = "^0.1.1", source = "internal" }
 
 [build-system]
 requires = ["poetry-core"]
