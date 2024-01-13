@@ -12,12 +12,17 @@ url = "https://pypi.blindfolded.surgery"
 priority = "explicit"
 
 [tool.poetry.dependencies]
-python = "~3.11"
+python = "~3.12"
 httpx = "^0.25.2"
 python-telegram-bot = "20.7"
 thefuzz = "^0.20.0"
 python-levenshtein = "^0.23.0"
 timhatdiehandandermaus-sdk = { version = "2.0.2", source = "internal" }
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.8.0"
+ruff = "^0.1.13"
+black = "^23.12.1"
 
 [build-system]
 requires = ["poetry-core"]

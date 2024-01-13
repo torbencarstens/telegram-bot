@@ -63,8 +63,8 @@ async def search(movie: MovieResponse) -> list[WostreamSearchResponseProvider] |
 async def search_multiple(
     movies: list[MovieResponse],
 ) -> list[WostreamSearchResponseProvider] | None:
-    responses = [_raw(movie) for movie in movies]
-    responses = [response for response in responses if response]
+    raw_responses = [_raw(movie) for movie in movies]
+    responses = [response for response in raw_responses if response]
     if not responses:
         return None
 

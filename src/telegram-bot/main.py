@@ -12,7 +12,7 @@ from utils import get_env_or_die
 
 
 def main(application: Application):
-    logger = create_logger(inspect.currentframe().f_code.co_name)
+    logger = create_logger(inspect.currentframe().f_code.co_name)  # type: ignore
     # tbot: telegram.Bot = application.bot
 
     # configure bot
@@ -30,7 +30,7 @@ def main(application: Application):
     application.add_handler(telegram.ext.CommandHandler("queue", bot.queue))
     application.add_handler(telegram.ext.CommandHandler("wostream", bot.wostream))
     # noinspection PyTypeChecker
-    application.add_error_handler(bot.error_handler)
+    application.add_error_handler(bot.error_handler)  # type: ignore
 
     logger.info("Starting up")
     application.run_polling()

@@ -48,7 +48,7 @@ async def handle_watch_delete(update: Update, context: ContextTypes.DEFAULT_TYPE
     title = " ".join(validate_context_args(context, "movie title required as argument"))
     command = "/watch" if watched else "/delete"
     # we always want to delete the old reply keyboard when a button on the reply keyboard has been pressed
-    reply_markup = ReplyKeyboardRemove()
+    reply_markup: ReplyKeyboardRemove | ReplyKeyboardMarkup = ReplyKeyboardRemove()
 
     movie_choices = api.fuzzy_search_movie(query=title, status=MovieStatusSearchRequestEnum.QUEUED)
     if not movie_choices:
@@ -118,10 +118,10 @@ async def wostream(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    log = create_logger(inspect.currentframe().f_code.co_name)
+    log = create_logger(inspect.currentframe().f_code.co_name)  # type: ignore
 
     try:
-        raise context.error
+        raise context.error  # type: ignore
     except MissingToken:
         message = "Failed to complete action, missing token"
         log.error(message, exc_info=True)
@@ -144,6 +144,6 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = escape_markdown(message)
     return await TextMessage(message).send(
         update,
-        reply_to_message_id=update.effective_message.message_id,
+        reply_to_message_id=update.effective_message.message_id,  # type: ignore
         disable_web_page_preview=True,
     )

@@ -9,8 +9,7 @@ async def send_movie_poll(*, chat_id: str, bot: telegram.Bot):
     MAX_POLL_OPTIONS = 10
 
     question = "Which movie do you want to watch?"
-    default_options = os.getenv("POLL_DEFAULT_OPTIONS") or "Mir egal"
-    default_options = default_options.split(",")
+    default_options = (os.getenv("POLL_DEFAULT_OPTIONS") or "Mir egal").split(",")
 
     movie_count = MAX_POLL_OPTIONS - len(default_options)
     movie_options = api.queued_movies(limit=movie_count)

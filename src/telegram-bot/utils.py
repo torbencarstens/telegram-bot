@@ -2,7 +2,7 @@ import inspect
 import os
 import socket
 import sys
-from typing import Dict, Optional
+from typing import Optional
 
 import requests as requests
 import urllib3 as urllib3
@@ -41,8 +41,8 @@ class RequestError(Exception):
     pass
 
 
-def get_json_from_url(url: str, *, headers: Dict = None) -> Optional[Dict]:
-    log = create_logger(inspect.currentframe().f_code.co_name)
+def get_json_from_url(url: str, *, headers: dict | None = None) -> Optional[dict]:
+    log = create_logger(inspect.currentframe().f_code.co_name)  # type: ignore
 
     try:
         response = requests.get(url, headers=headers)
@@ -62,7 +62,7 @@ def get_json_from_url(url: str, *, headers: Dict = None) -> Optional[Dict]:
 
 
 def get_env_or_die(env_variable: str, *, exit_code: int = 1) -> str:
-    logger = create_logger(inspect.currentframe().f_code.co_name)
+    logger = create_logger(inspect.currentframe().f_code.co_name)  # type: ignore
     if value := os.getenv(env_variable):
         return value
 

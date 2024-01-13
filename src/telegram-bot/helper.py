@@ -1,7 +1,6 @@
 import dataclasses
 from abc import abstractmethod
 from enum import Enum
-from typing import List
 
 import telegram.constants
 from telegram import Update
@@ -29,7 +28,8 @@ class TextMessage(Message):
         params.update(**kwargs)
 
         for message in messages:
-            await update.effective_chat.send_message(text=message, **params)
+            # we're gonna assume that effective_chat is available
+            await update.effective_chat.send_message(text=message, **params)  # type: ignore
             params["disable_notification"] = True
 
     type = MessageType.Text
@@ -37,9 +37,9 @@ class TextMessage(Message):
     split_by = "\n"
     join_with = "\n"
 
-    def split(self) -> List[str]:
+    def split(self) -> list[str]:
         message_length = 4096
-        messages: List[List[str]] = []
+        messages: list[list[str]] = []
         current_message_length = 0
         current_message_index = 0
         join_by_length = len(self.join_with)
@@ -75,7 +75,8 @@ class PhotoMessage(Message):
     caption: str = ""
 
     async def send(self, update: Update):
-        await update.effective_message.reply_photo(
+        # we're gonna assume that effective_message is available
+        await update.effective_message.reply_photo(  # type: ignore
             self.url,
             caption=self.caption[:1024],
             parse_mode=self.parse_mode,
