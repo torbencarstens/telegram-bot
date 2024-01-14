@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 RUN apt-get update
 RUN apt-get install -y vim
@@ -9,7 +9,7 @@ ENV PATH=$PATH:/app/.local/bin
 
 WORKDIR /app
 
-RUN pip install pipx==1.3.3 --user --no-cache
+RUN pip install pipx==1.4.2 --user --no-cache
 RUN pipx install poetry==1.7.1
 RUN poetry config virtualenvs.create false
 
