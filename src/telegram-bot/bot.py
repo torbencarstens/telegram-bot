@@ -51,9 +51,10 @@ async def handle_watch_delete(update: Update, context: ContextTypes.DEFAULT_TYPE
     reply_markup: ReplyKeyboardRemove | ReplyKeyboardMarkup = ReplyKeyboardRemove()
 
     movie_choices = api.fuzzy_search_movie(query=title, status=MovieStatusSearchRequestEnum.QUEUED)
+
     if not movie_choices:
         message = f"no match found for `{title}`"
-    elif len(movie_choices) == 1:
+    elif len(movie_choices) == 1 or movie_choices[0].imdb.title.lower() == title.lower():
         queue_id = movie_choices[0].id
         if watched:
             response = api.mark_movie_as_watched(queue_id=queue_id)
