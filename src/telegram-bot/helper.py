@@ -1,6 +1,7 @@
 import dataclasses
 from abc import abstractmethod
 from enum import Enum
+from typing import Any
 
 import telegram.constants
 from telegram import Update
@@ -24,7 +25,7 @@ class Message:
 class TextMessage(Message):
     async def send(self, update: Update, **kwargs):
         messages = self.split()
-        params = {"parse_mode": telegram.constants.ParseMode.MARKDOWN_V2}
+        params: dict[str, Any] = {"parse_mode": telegram.constants.ParseMode.MARKDOWN_V2}
         params.update(**kwargs)
 
         for message in messages:
