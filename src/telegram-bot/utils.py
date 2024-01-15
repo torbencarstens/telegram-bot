@@ -1,11 +1,10 @@
 import inspect
 import os
-import socket
 import sys
 from typing import Optional
 
-import requests as requests
-import urllib3 as urllib3
+import httpx
+import httpx as requests
 
 from logger import create_logger
 
@@ -48,14 +47,13 @@ def get_json_from_url(url: str, *, headers: dict | None = None) -> Optional[dict
         response = requests.get(url, headers=headers)
         content = response.json()
     except (
-        requests.exceptions.ConnectionError,
-        socket.gaierror,
-        urllib3.exceptions.MaxRetryError,
+        httpx.HTTPError,
+        httpx.HTTPStatusError,
     ) as e:
-        log.exception("failed to communicate with jokes api")
+        log.exception("failed to communicate with api")
         raise RequestError(e)
 
-    if not response.ok:
+    if not response.status_code < 400:
         raise RequestError(f"[{response.status_code}]{response.text}")
 
     return content
