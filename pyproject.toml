@@ -21,7 +21,7 @@ timhatdiehandandermaus-sdk = { version = "2.0.2", source = "internal" }
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.8.0"
-ruff = "^0.1.13"
+ruff = "^0.2.0"
 black = "^24.0.0"
 
 [build-system]
