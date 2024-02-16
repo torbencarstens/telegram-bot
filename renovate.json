@@ -2,5 +2,22 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "github>tim-hat-die-hand-an-der-maus/renovate-config"
+  ],
+  "packageRules": [
+    {
+      "matchCategories": [
+        "python"
+      ],
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "description": "python-telegram-bot/timhatdiehandandermaus-sdk uses httpx as well and set tight version constraints",
+      "matchDepNames": [
+        "python-telegram-bot",
+        "httpx",
+        "timhatdiehandandermaus-sdk"
+      ],
+      "groupName": "httpx and python-telegram-bot"
+    }
   ]
 }
