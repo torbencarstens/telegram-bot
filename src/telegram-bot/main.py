@@ -3,7 +3,7 @@ import inspect
 import sys
 
 import telegram.ext
-from telegram.ext import ApplicationBuilder, Application
+from telegram.ext import ApplicationBuilder, Application, filters
 
 import bot
 import poll
@@ -24,11 +24,23 @@ def main(application: Application):
     application.add_handler(
         telegram.ext.CommandHandler("werhatdiehandandermaus", bot.werhatdiehandandermaus)
     )
-    application.add_handler(telegram.ext.CommandHandler("add", bot.add))
-    application.add_handler(telegram.ext.CommandHandler("delete", bot.delete))
-    application.add_handler(telegram.ext.CommandHandler("watch", bot.watch))
-    application.add_handler(telegram.ext.CommandHandler("queue", bot.queue))
-    application.add_handler(telegram.ext.CommandHandler("wostream", bot.wostream))
+    not_edited_message_filter = ~filters.UpdateType.EDITED_MESSAGE
+    application.add_handler(
+        telegram.ext.CommandHandler("add", bot.add, filters=not_edited_message_filter)
+    )
+    application.add_handler(
+        telegram.ext.CommandHandler("delete", bot.delete, filters=not_edited_message_filter)
+    )
+    application.add_handler(
+        telegram.ext.CommandHandler("watch", bot.watch, filters=not_edited_message_filter)
+    )
+    application.add_handler(
+        telegram.ext.CommandHandler("queue", bot.queue, filters=not_edited_message_filter)
+    )
+    application.add_handler(
+        telegram.ext.CommandHandler("wostream", bot.wostream, filters=not_edited_message_filter)
+    )
+
     # noinspection PyTypeChecker
     application.add_error_handler(bot.error_handler)  # type: ignore
 
