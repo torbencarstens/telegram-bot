@@ -13,10 +13,10 @@ priority = "explicit"
 
 [tool.poetry.dependencies]
 python = "~3.12"
-httpx = "^0.25.2"
-python-telegram-bot = "20.7"
+httpx = "^0.26.0"
+python-telegram-bot = "20.8"
 python-levenshtein = "^0.25.0"
-timhatdiehandandermaus-sdk = { version = "2.0.2", source = "internal" }
+timhatdiehandandermaus-sdk = { version = "2.0.4", source = "internal" }
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.8.0"
