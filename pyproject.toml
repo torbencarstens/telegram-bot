@@ -14,7 +14,7 @@ priority = "explicit"
 [tool.poetry.dependencies]
 python = "~3.12"
 httpx = "^0.26.0"
-python-telegram-bot = "20.8"
+python-telegram-bot = "21.0.1"
 python-levenshtein = "^0.25.0"
 timhatdiehandandermaus-sdk = { version = "2.0.4", source = "internal" }
 
