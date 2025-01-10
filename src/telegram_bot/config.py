@@ -26,7 +26,7 @@ class TelegramConfig:
     def from_env(cls, env: Env) -> Self:
         return cls(
             poll_chat_id=env.get_int("POLL_CHAT_ID", required=True),
-            token=env.get_string("TOKEN", required=True),
+            token=env.get_string("TEMP_TOKEN", required=True),
         )
 
 
