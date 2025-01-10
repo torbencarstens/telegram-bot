@@ -5,10 +5,10 @@ import sys
 import telegram.ext
 from telegram.ext import ApplicationBuilder, Application, filters
 
-import bot
-import poll
-from logger import create_logger
-from utils import get_env_or_die
+from telegram_bot import bot
+from telegram_bot import poll
+from telegram_bot.logger import create_logger
+from telegram_bot.utils import get_env_or_die
 
 
 def main(application: Application):

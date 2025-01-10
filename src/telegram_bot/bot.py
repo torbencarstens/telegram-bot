@@ -15,11 +15,11 @@ from timhatdiehandandermaus_sdk import (
     MovieStatusSearchRequestEnum,
 )
 
-from exceptions import MissingContextArgs
-from helper import TextMessage
-from logger import create_logger
-from utils import escape_markdown, get_env_or_die
-from wostream import search_multiple
+from telegram_bot.exceptions import MissingContextArgs
+from telegram_bot.helper import TextMessage
+from telegram_bot.logger import create_logger
+from telegram_bot.utils import escape_markdown, get_env_or_die
+from telegram_bot.wostream import search_multiple
 
 api = TimApi(get_env_or_die("API_TOKEN"))
 

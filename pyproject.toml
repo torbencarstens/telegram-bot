@@ -1,31 +1,56 @@
-[tool.poetry]
+[project]
+requires-python = "==3.13.*"
 name = "telegram-bot"
-version = "0.1.0"
+version = "1.0.0"
 description = ""
-authors = ["Blindfolded Surgery <team@blindfolded.surgery>"]
-license = "MIT"
-readme = "README.md"
+authors = [{ name = "BlindfoldedSurgery", email = "team@blindfolded.surgery" }]
+classifiers = [
+    "Private :: Do Not Upload",
+    "License :: OSI Approved :: MIT License",
+]
 
-[[tool.poetry.source]]
+dependencies = [
+    "httpx ==0.28.*",
+    "python-telegram-bot ==21.10",
+    "python-levenshtein ==0.26.1",
+    "sentry-sdk ==2.19.*",
+    "timhatdiehandandermaus-sdk ==3.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "mypy ==1.14.*",
+    "pytest >=8, <9",
+    "ruff ==0.9.1",
+]
+
+[[tool.uv.index]]
 name = "internal"
-url = "https://pypi.blindfolded.surgery"
-priority = "explicit"
+url = "https://pypi.bjoernpetersen.net"
+explicit = true
 
-[tool.poetry.dependencies]
-python = "~3.12"
-httpx = "^0.26.0"
-python-telegram-bot = "20.8"
-python-levenshtein = "^0.25.0"
-timhatdiehandandermaus-sdk = { version = "2.0.4", source = "internal" }
-
-[tool.poetry.group.dev.dependencies]
-mypy = "^1.8.0"
-ruff = "^0.3.0"
-black = "^24.0.0"
+[tool.uv.sources]
+timhatdiehandandermaus-sdk = { index = "internal" }
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.black]
-line-length = 100
+[tool.ruff.lint]
+select = [
+    "E4",
+    "E7",
+    "E9",
+    "F",
+    "FURB",
+    "G",
+    "I001",
+    "LOG",
+    "PTH",
+    "Q",
+    "UP",
+]
+ignore = [
+    # redundant-open-modes
+    "UP015",
+]

@@ -15,7 +15,7 @@ RUN poetry config virtualenvs.create false
 
 COPY --chown=app:app [ "poetry.lock", "pyproject.toml", "./" ]
 
-COPY --chown=app:app src/telegram-bot ./src/telegram-bot
+COPY --chown=app:app src/telegram_bot ./src/telegram-bot
 
 RUN poetry install
 
