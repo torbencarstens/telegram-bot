@@ -1,0 +1,48 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bot
+spec:
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: bot
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: bot
+  serviceName: bot
+  template:
+    metadata:
+      labels:
+        app: bot
+    spec:
+      serviceAccountName: bot
+      terminationGracePeriodSeconds: 120
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: app
+          image: {{ .Values.image.app }}:{{ .Values.appVersion }}
+          envFrom:
+            - configMapRef:
+                name: config
+            - secretRef:
+                name: secrets
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 256Mi
+            limits:
+              cpu: "1"

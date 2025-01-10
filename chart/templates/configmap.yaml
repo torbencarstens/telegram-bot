@@ -1,10 +1,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Values.configmap.name }}
-  namespace: {{ .Values.namespace }}
+  name: config
 data:
-  API_URL: "{{ .Values.configmap.baseUrl }}"
-  POLL_DEFAULT_OPTIONS: "{{ .Values.poll.defaultOptions }}"
-  WOSTREAM_BASE_URL: "{{ .Values.configmap.woStreamBaseUrl }}"
-  POLL_CHAT_ID: "{{ .Values.configmap.chatId }}"
+  API_URL: "http://api.tim-api"
+  WOSTREAM_BASE_URL: "http://streamingprovider-resolver"
+  POLL_CHAT_ID: "-1001556735505"

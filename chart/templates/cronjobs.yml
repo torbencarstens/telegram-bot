@@ -1,0 +1,39 @@
+{{- range .Values.cronjobs }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .name }}
+spec:
+  schedule: "{{ .schedule }}"
+  timeZone: "Europe/Berlin"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  startingDeadlineSeconds: 1200
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 1200
+      template:
+        spec:
+          serviceAccountName: bot
+          securityContext:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          restartPolicy: Never
+          containers:
+          - name: app
+            image: {{ $.Values.image.app }}:{{ $.Values.appVersion }}
+            args: {{ .args | toJson }}
+            envFrom:
+              - configMapRef:
+                  name: config
+              - secretRef:
+                  name: secrets
+            resources: {{ .resources | toJson }}
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: [ALL]
+{{- end }}

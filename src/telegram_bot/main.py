@@ -8,14 +8,17 @@ from telegram.ext import Application, ApplicationBuilder, filters
 from timhatdiehandandermaus_sdk import TimApi
 
 from telegram_bot import bot, poll
-from telegram_bot.config import Config, load_config
+from telegram_bot.config import ApiConfig, Config, load_config
 
 _logger = logging.getLogger(__name__)
 
 
-def main(application: Application, api_token: str) -> None:
+def main(
+    application: Application,
+    api_config: ApiConfig,
+) -> None:
     # tbot: telegram.Bot = application.bot
-    bot.api = TimApi(api_token)
+    bot.api = TimApi(api_config.token, api_url=api_config.base_url)
 
     # configure bot
     # asyncio.ensure_future(tbot.set_my_commands(config.COMMANDS))
@@ -84,19 +87,19 @@ if __name__ == "__main__":
     args = sys.argv[1:]
     _logger.info("args: %s", args)
     if not args:
-        main(_application, config.api_token)
+        main(_application, config.api)
     else:
         if args[0] == "poll":
             asyncio.run(
                 poll.send_movie_poll(
-                    chat_id=config.telegram.poll_chat_id,
+                    config=config,
                     bot=_application.bot,
                 )
             )
         elif args[0] == "participation-poll":
             asyncio.run(
                 poll.send_participation_poll(
-                    chat_id=config.telegram.poll_chat_id,
+                    config=config,
                     bot=_application.bot,
                 )
             )

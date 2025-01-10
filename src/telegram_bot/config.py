@@ -5,6 +5,19 @@ from bs_config import Env
 
 
 @dataclass(frozen=True, kw_only=True)
+class ApiConfig:
+    base_url: str
+    token: str
+
+    @classmethod
+    def from_env(cls, env: Env) -> Self:
+        return cls(
+            base_url=env.get_string("BASE_URL", default="http://api.tim-api"),
+            token=env.get_string("TOKEN", required=True),
+        )
+
+
+@dataclass(frozen=True, kw_only=True)
 class TelegramConfig:
     poll_chat_id: int
     token: str
@@ -19,7 +32,7 @@ class TelegramConfig:
 
 @dataclass(frozen=True, kw_only=True)
 class Config:
-    api_token: str
+    api: ApiConfig
     app_version: str
     telegram: TelegramConfig
     sentry_dsn: str | None
@@ -27,7 +40,7 @@ class Config:
     @classmethod
     def from_env(cls, env: Env) -> Self:
         return cls(
-            api_token=env.get_string("API_TOKEN", required=True),
+            api=ApiConfig.from_env(env.scoped("API_")),
             app_version=env.get_string("APP_VERSION", default="dev"),
             telegram=TelegramConfig.from_env(env.scoped("TELEGRAM_")),
             sentry_dsn=env.get_string("SENTRY_DSN"),

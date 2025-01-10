@@ -1,74 +1,31 @@
-namespace: timhatdiehandandermaus
+appVersion: latest
+image:
+  app: ghcr.io/tim-hat-die-hand-an-der-maus/telegram-bot
 
-deployment:
-  name: telegram-bot
-  image: ghcr.io/tim-hat-die-hand-an-der-maus/telegram-bot:__TAG__
-  imagePullPolicy: IfNotPresent
-  revisionHistoryLimit: 1
-  command: [ "poetry" ]
-  args: [ "run", "python", "-OOO", "-B", "src/telegram-bot/main.py" ]
-  replicas: 1
-  labels:
-    app: telegram-bot
-  requests:
-    cpu: 100m
-    memory: 100Mi
-  limit:
-    cpu: 300m
-    memory: 300Mi
-
-cronjob:
+cronjobs:
   movie:
-    name: telegram-bot-which-movie-poll
-    image: ghcr.io/tim-hat-die-hand-an-der-maus/telegram-bot:__TAG__
-    imagePullPolicy: Always
-    command: [ "poetry" ]
-    args: [ "run", "python", "-OOO", "-B", "src/telegram-bot/main.py", "poll" ]
+    name: which-movie-poll
+    args: [ "poll" ]
     schedule: "0 19 * * 5"
-    timeZone: "Europe/Berlin"
-    backoffLimit: 0
-    successfulJobsHistoryLimit: 1
-    failedJobsHistoryLimit: 1
-    restartPolicy: Never
-    labels:
-      app: telegram-bot-poll
-    requests:
-      cpu: 100m
-      memory: 100Mi
-    limit:
-      cpu: 300m
-      memory: 300Mi
+    resources:
+      requests:
+        cpu: 300m
+        memory: 100Mi
+      limits:
+        cpu: 300m
+        memory: 300Mi
   participation:
-    name: telegram-bot-participation-poll
-    image: ghcr.io/tim-hat-die-hand-an-der-maus/telegram-bot:__TAG__
-    imagePullPolicy: Always
-    command: [ "poetry" ]
-    args: [ "run", "python", "-OOO", "-B", "src/telegram-bot/main.py", "participation-poll" ]
+    name: participation-poll
+    args: [ "participation-poll" ]
     schedule: "0 16 * * 0"
-    timeZone: "Europe/Berlin"
-    backoffLimit: 0
-    successfulJobsHistoryLimit: 1
-    failedJobsHistoryLimit: 1
-    restartPolicy: Never
-    labels:
-      app: telegram-bot-poll
-    requests:
-      cpu: 100m
-      memory: 100Mi
-    limit:
-      cpu: 300m
-      memory: 300Mi
-
-poll:
-  defaultOptions: "Mir egal"
+    resources:
+      requests:
+        cpu: 300m
+        memory: 100Mi
+      limits:
+        cpu: 300m
+        memory: 300Mi
 
 configmap:
-  name: telegram-bot-config
-  baseUrl: "http://api:8080"
   chatId: "-1001556735505"
   woStreamBaseUrl: "http://streamingprovider-resolver"
-
-secret:
-  name: telegram-token
-  telegramToken: __TELEGRAM_TOKEN__
-  apiToken: __API_TOKEN__
