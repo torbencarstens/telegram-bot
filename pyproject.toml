@@ -14,7 +14,7 @@ dependencies = [
     "python-telegram-bot ==21.10",
     "python-levenshtein ==0.26.1",
     "sentry-sdk ==2.19.*",
-    "timhatdiehandandermaus-sdk ==3.0.0",
+    "timhatdiehandandermaus-sdk ==3.0.1",
 ]
 
 [dependency-groups]

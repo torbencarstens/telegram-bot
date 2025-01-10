@@ -1,5 +1,5 @@
-import inspect
 import itertools
+import logging
 
 import httpx
 from telegram import (
@@ -17,10 +17,10 @@ from timhatdiehandandermaus_sdk import (
 
 from telegram_bot.exceptions import MissingContextArgs
 from telegram_bot.helper import TextMessage
-from telegram_bot.logger import create_logger
 from telegram_bot.utils import escape_markdown, get_env_or_die
 from telegram_bot.wostream import search_multiple
 
+_logger = logging.getLogger(__name__)
 api = TimApi(get_env_or_die("API_TOKEN"))
 
 
@@ -127,13 +127,11 @@ async def wostream(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    log = create_logger(inspect.currentframe().f_code.co_name)  # type: ignore
-
     try:
         raise context.error  # type: ignore
     except MissingToken:
         message = "Failed to complete action, missing token"
-        log.error(message, exc_info=True)
+        _logger.exception(message)
     except httpx.HTTPStatusError as e:
         if e.response.status_code == 401:
             message = "Cannot complete action, failed to authorize to TimApi"
@@ -145,7 +143,7 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message = f"Unhandled status code error:\n{str(e)}"
     except httpx.HTTPError as e:
         message = "failed to complete action"
-        log.error(message, exc_info=True)
+        _logger.exception(message)
         message += f"\n{str(e)}"
     except MissingContextArgs as e:
         message = e.msg

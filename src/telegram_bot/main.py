@@ -1,17 +1,17 @@
 import asyncio
-import inspect
+import logging
 import sys
 
 import telegram.ext
 from telegram.ext import Application, ApplicationBuilder, filters
 
 from telegram_bot import bot, poll
-from telegram_bot.logger import create_logger
 from telegram_bot.utils import get_env_or_die
+
+_logger = logging.getLogger(__name__)
 
 
 def main(application: Application):
-    logger = create_logger(inspect.currentframe().f_code.co_name)  # type: ignore
     # tbot: telegram.Bot = application.bot
 
     # configure bot
@@ -53,7 +53,7 @@ def main(application: Application):
     # noinspection PyTypeChecker
     application.add_error_handler(bot.error_handler)  # type: ignore
 
-    logger.info("Starting up")
+    _logger.info("Starting up")
     application.run_polling()
 
 
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     _application = ApplicationBuilder().token(bot_token).build()
 
     args = sys.argv[1:]
-    create_logger("__main__").info(f"args: {args}")
+    _logger.info("args: %s", args)
     if not args:
         main(_application)
     else:

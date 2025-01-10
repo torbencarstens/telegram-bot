@@ -1,10 +1,11 @@
-import inspect
+import logging
 import os
 import sys
 
 import httpx
 import httpx as requests
-from logger import create_logger
+
+_logger = logging.getLogger(__name__)
 
 
 def escape_markdown(text: str) -> str:
@@ -39,8 +40,6 @@ class RequestError(Exception):
 
 
 def get_json_from_url(url: str, *, headers: dict | None = None) -> dict | None:
-    log = create_logger(inspect.currentframe().f_code.co_name)  # type: ignore
-
     try:
         response = requests.get(url, headers=headers)
         content = response.json()
@@ -48,7 +47,7 @@ def get_json_from_url(url: str, *, headers: dict | None = None) -> dict | None:
         httpx.HTTPError,
         httpx.HTTPStatusError,
     ) as e:
-        log.exception("failed to communicate with api")
+        _logger.exception("failed to communicate with api")
         raise RequestError(e)
 
     if not response.status_code < 400:
@@ -57,10 +56,10 @@ def get_json_from_url(url: str, *, headers: dict | None = None) -> dict | None:
     return content
 
 
+# TODO: replace with bs-config
 def get_env_or_die(env_variable: str, *, exit_code: int = 1) -> str:
-    logger = create_logger(inspect.currentframe().f_code.co_name)  # type: ignore
     if value := os.getenv(env_variable):
         return value
 
-    logger.critical(f"failed to retrieve token from environment (`{env_variable}`)")
+    _logger.critical("failed to retrieve token from environment (`%s`)", env_variable)
     sys.exit(exit_code)
