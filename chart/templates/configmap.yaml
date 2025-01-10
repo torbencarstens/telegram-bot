@@ -5,5 +5,4 @@ metadata:
 data:
   API_URL: "http://api.tim-api"
   WOSTREAM_BASE_URL: "http://streamingprovider-resolver"
-  #TELEGRAM_POLL_CHAT_ID: "-1001556735505"
-  TELEGRAM_POLL_CHAT_ID: "133399998"
+  TELEGRAM_POLL_CHAT_ID: "-1001556735505"
