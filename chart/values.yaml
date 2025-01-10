@@ -25,7 +25,3 @@ cronjobs:
       limits:
         cpu: 300m
         memory: 300Mi
-
-configmap:
-  chatId: "-1001556735505"
-  woStreamBaseUrl: "http://streamingprovider-resolver"
