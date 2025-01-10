@@ -2,17 +2,20 @@ import asyncio
 import logging
 import sys
 
+import sentry_sdk
 import telegram.ext
 from telegram.ext import Application, ApplicationBuilder, filters
+from timhatdiehandandermaus_sdk import TimApi
 
 from telegram_bot import bot, poll
-from telegram_bot.utils import get_env_or_die
+from telegram_bot.config import Config, load_config
 
 _logger = logging.getLogger(__name__)
 
 
-def main(application: Application):
+def main(application: Application, api_token: str) -> None:
     # tbot: telegram.Bot = application.bot
+    bot.api = TimApi(api_token)
 
     # configure bot
     # asyncio.ensure_future(tbot.set_my_commands(config.COMMANDS))
@@ -57,19 +60,43 @@ def main(application: Application):
     application.run_polling()
 
 
+def _setup_monitoring(config: Config) -> None:
+    logging.basicConfig()
+
+    logging.root.level = logging.WARNING
+    logging.getLogger(__package__).level = logging.DEBUG
+
+    sentry_dsn = config.sentry_dsn
+    if sentry_dsn is not None:
+        sentry_sdk.init(
+            dsn=sentry_dsn,
+            release=config.app_version,
+        )
+    else:
+        _logger.warning("Sentry is disabled")
+
+
 if __name__ == "__main__":
-    bot_token = get_env_or_die("BOT_TOKEN", exit_code=1)
-    _application = ApplicationBuilder().token(bot_token).build()
+    config = load_config()
+    _setup_monitoring(config)
+    _application = ApplicationBuilder().token(config.telegram.token).build()
 
     args = sys.argv[1:]
     _logger.info("args: %s", args)
     if not args:
-        main(_application)
+        main(_application, config.api_token)
     else:
-        chat_id = get_env_or_die("POLL_CHAT_ID", exit_code=2)
         if args[0] == "poll":
-            asyncio.run(poll.send_movie_poll(chat_id=chat_id, bot=_application.bot))
+            asyncio.run(
+                poll.send_movie_poll(
+                    chat_id=config.telegram.poll_chat_id,
+                    bot=_application.bot,
+                )
+            )
         elif args[0] == "participation-poll":
             asyncio.run(
-                poll.send_participation_poll(chat_id=chat_id, bot=_application.bot)
+                poll.send_participation_poll(
+                    chat_id=config.telegram.poll_chat_id,
+                    bot=_application.bot,
+                )
             )

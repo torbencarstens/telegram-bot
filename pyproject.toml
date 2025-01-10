@@ -10,6 +10,7 @@ classifiers = [
 ]
 
 dependencies = [
+    "bs-config [dotenv] ==1.1.1",
     "httpx ==0.28.*",
     "python-telegram-bot ==21.10",
     "python-levenshtein ==0.26.1",
@@ -30,6 +31,7 @@ url = "https://pypi.bjoernpetersen.net"
 explicit = true
 
 [tool.uv.sources]
+bs-config = { index = "internal" }
 timhatdiehandandermaus-sdk = { index = "internal" }
 
 [build-system]

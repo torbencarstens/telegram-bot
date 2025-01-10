@@ -1,6 +1,4 @@
 import logging
-import os
-import sys
 
 import httpx
 import httpx as requests
@@ -54,12 +52,3 @@ def get_json_from_url(url: str, *, headers: dict | None = None) -> dict | None:
         raise RequestError(f"[{response.status_code}]{response.text}")
 
     return content
-
-
-# TODO: replace with bs-config
-def get_env_or_die(env_variable: str, *, exit_code: int = 1) -> str:
-    if value := os.getenv(env_variable):
-        return value
-
-    _logger.critical("failed to retrieve token from environment (`%s`)", env_variable)
-    sys.exit(exit_code)

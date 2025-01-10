@@ -17,11 +17,11 @@ from timhatdiehandandermaus_sdk import (
 
 from telegram_bot.exceptions import MissingContextArgs
 from telegram_bot.helper import TextMessage
-from telegram_bot.utils import escape_markdown, get_env_or_die
+from telegram_bot.utils import escape_markdown
 from telegram_bot.wostream import search_multiple
 
 _logger = logging.getLogger(__name__)
-api = TimApi(get_env_or_die("API_TOKEN"))
+api: TimApi = None  # type: ignore
 
 
 def validate_context_args(context: ContextTypes.DEFAULT_TYPE, msg: str) -> list[str]:

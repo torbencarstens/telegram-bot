@@ -4,7 +4,7 @@ import telegram
 from timhatdiehandandermaus_sdk import TimApi
 
 
-async def send_movie_poll(*, chat_id: str, bot: telegram.Bot):
+async def send_movie_poll(*, chat_id: int, bot: telegram.Bot):
     api = TimApi()
     MAX_POLL_OPTIONS = 10
 
@@ -25,7 +25,7 @@ async def send_movie_poll(*, chat_id: str, bot: telegram.Bot):
     )
 
 
-async def send_participation_poll(*, chat_id: str, bot: telegram.Bot):
+async def send_participation_poll(*, chat_id: int, bot: telegram.Bot):
     question = "Ich bin"
     options = ["dabei", "nicht dabei", "vielleicht dabei"]
 
