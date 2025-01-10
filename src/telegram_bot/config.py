@@ -11,7 +11,5 @@ COMMANDS = [
 ]
 
 NAME = "timhatdiehandandermaus"
-DESCRIPTION = (
-    "interact with the timhatdiehandandermaus API (https://api.timhatdiehandandermaus.consulting)"
-)
+DESCRIPTION = "interact with the timhatdiehandandermaus API (https://api.timhatdiehandandermaus.consulting)"
 SHORT_DESCRIPTION = "interact with tim"

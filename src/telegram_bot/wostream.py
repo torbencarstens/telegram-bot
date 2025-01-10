@@ -3,8 +3,8 @@ from collections import defaultdict
 
 import httpx
 from pydantic import BaseModel
-
 from timhatdiehandandermaus_sdk.models import MovieResponse
+
 from telegram_bot.utils import escape_markdown
 
 
@@ -34,7 +34,9 @@ class WostreamSearchResponseProvider(BaseModel):
 
 
 def _raw(movie: MovieResponse) -> dict | None:
-    base_url = os.getenv("WOSTREAM_BASE_URL") or "http://streamingprovider-resolver/search"
+    base_url = (
+        os.getenv("WOSTREAM_BASE_URL") or "http://streamingprovider-resolver/search"
+    )
     url = "/".join([base_url.rstrip("/"), "search"])
 
     response = httpx.post(
@@ -57,7 +59,9 @@ async def search(movie: MovieResponse) -> list[WostreamSearchResponseProvider] |
         return None
 
     results = data["results"]
-    return [WostreamSearchResponseProvider.model_validate(provider) for provider in results]
+    return [
+        WostreamSearchResponseProvider.model_validate(provider) for provider in results
+    ]
 
 
 async def search_multiple(
@@ -75,8 +79,10 @@ async def search_multiple(
             providers[provider["name"]].extend(provider["movies"])
 
     responseProviders = [
-        {"name": provider_name, "movies": movies} for provider_name, movies in providers.items()
+        {"name": provider_name, "movies": movies}
+        for provider_name, movies in providers.items()
     ]
     return [
-        WostreamSearchResponseProvider.model_validate(provider) for provider in responseProviders
+        WostreamSearchResponseProvider.model_validate(provider)
+        for provider in responseProviders
     ]

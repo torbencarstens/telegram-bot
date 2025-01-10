@@ -25,7 +25,9 @@ class Message:
 class TextMessage(Message):
     async def send(self, update: Update, **kwargs):
         messages = self.split()
-        params: dict[str, Any] = {"parse_mode": telegram.constants.ParseMode.MARKDOWN_V2}
+        params: dict[str, Any] = {
+            "parse_mode": telegram.constants.ParseMode.MARKDOWN_V2
+        }
         params.update(**kwargs)
 
         for message in messages:

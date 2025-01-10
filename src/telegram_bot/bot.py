@@ -3,16 +3,16 @@ import itertools
 
 import httpx
 from telegram import (
-    Update,
-    ReplyKeyboardMarkup,
     KeyboardButton,
+    ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
+    Update,
 )
 from telegram.ext import ContextTypes
 from timhatdiehandandermaus_sdk import (
     MissingToken,
-    TimApi,
     MovieStatusSearchRequestEnum,
+    TimApi,
 )
 
 from telegram_bot.exceptions import MissingContextArgs
@@ -44,17 +44,23 @@ async def add(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def handle_watch_delete(update: Update, context: ContextTypes.DEFAULT_TYPE, *, watched: bool):
+async def handle_watch_delete(
+    update: Update, context: ContextTypes.DEFAULT_TYPE, *, watched: bool
+):
     title = " ".join(validate_context_args(context, "movie title required as argument"))
     command = "/watch" if watched else "/delete"
     # we always want to delete the old reply keyboard when a button on the reply keyboard has been pressed
     reply_markup: ReplyKeyboardRemove | ReplyKeyboardMarkup = ReplyKeyboardRemove()
 
-    movie_choices = api.fuzzy_search_movie(query=title, status=MovieStatusSearchRequestEnum.QUEUED)
+    movie_choices = api.fuzzy_search_movie(
+        query=title, status=MovieStatusSearchRequestEnum.QUEUED
+    )
 
     if not movie_choices:
         message = f"no match found for `{title}`"
-    elif len(movie_choices) == 1 or movie_choices[0].imdb.title.lower() == title.lower():
+    elif (
+        len(movie_choices) == 1 or movie_choices[0].imdb.title.lower() == title.lower()
+    ):
         queue_id = movie_choices[0].id
         if watched:
             response = api.mark_movie_as_watched(queue_id=queue_id)
@@ -62,7 +68,10 @@ async def handle_watch_delete(update: Update, context: ContextTypes.DEFAULT_TYPE
             response = api.mark_movie_as_deleted(queue_id=queue_id)
         message = response.telegram_markdown_v2()
     else:
-        buttons = [KeyboardButton(text=f"{command} {movie.imdb.title}") for movie in movie_choices]
+        buttons = [
+            KeyboardButton(text=f"{command} {movie.imdb.title}")
+            for movie in movie_choices
+        ]
         # display 2 buttons per row
         keyboard = list(itertools.pairwise(buttons))
         mark_as = "watched" if watched else "deleted"
@@ -73,9 +82,7 @@ async def handle_watch_delete(update: Update, context: ContextTypes.DEFAULT_TYPE
             resize_keyboard=True,
             input_field_placeholder=f"mark selected movie as {mark_as}",
         )
-        message = (
-            r"Choose the matching movie from the reply keyboard \(does not work in telegram web\)"
-        )
+        message = r"Choose the matching movie from the reply keyboard \(does not work in telegram web\)"
 
     return await TextMessage(message).send(
         update, reply_markup=reply_markup, disable_web_page_preview=True
@@ -109,7 +116,8 @@ async def wostream(update: Update, context: ContextTypes.DEFAULT_TYPE):
     providers = await search_multiple(movies)
     if not providers:
         titles = "\n".join(
-            f"{escape_markdown(movie.imdb.title)} ({movie.imdb.year})" for movie in movies
+            f"{escape_markdown(movie.imdb.title)} ({movie.imdb.year})"
+            for movie in movies
         )
         message = f"Couldn't find any movies\n{titles}\non https://werstreamt.es"
     else:

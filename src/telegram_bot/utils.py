@@ -1,11 +1,9 @@
 import inspect
 import os
 import sys
-from typing import Optional
 
 import httpx
 import httpx as requests
-
 from logger import create_logger
 
 
@@ -40,7 +38,7 @@ class RequestError(Exception):
     pass
 
 
-def get_json_from_url(url: str, *, headers: dict | None = None) -> Optional[dict]:
+def get_json_from_url(url: str, *, headers: dict | None = None) -> dict | None:
     log = create_logger(inspect.currentframe().f_code.co_name)  # type: ignore
 
     try:
