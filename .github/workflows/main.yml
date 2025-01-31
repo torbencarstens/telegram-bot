@@ -31,7 +31,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    uses: tim-hat-die-hand-an-der-maus/actions-container/.github/workflows/build-dual-image-kaniko.yml@v5
+    uses: tim-hat-die-hand-an-der-maus/actions-container/.github/workflows/build-dual-image-kaniko.yml@v7
     with:
       push-image: ${{ github.ref_name == github.event.repository.default_branch }}
 
@@ -60,4 +60,4 @@ jobs:
     needs: [ deploy ]
     permissions:
       packages: write
-    uses: tim-hat-die-hand-an-der-maus/actions-container/.github/workflows/clean.yml@v5
+    uses: tim-hat-die-hand-an-der-maus/actions-container/.github/workflows/clean.yml@v7
